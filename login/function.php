@@ -1,9 +1,9 @@
 <?php
-// Include database connection
-include '../config/db.php';
-
 // Start the session to store error messages
 session_start();
+
+// Include database connection
+include '../config/db.php';
 
 // Handle form submission
 if (isset($_POST['login'])) {
@@ -21,16 +21,16 @@ if (isset($_POST['login'])) {
         if (password_verify($password, $user['password'])) {
             // User is authenticated, store user details in session
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix'];
+            $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix'];
             $_SESSION['user_type'] = $user['user_type'];
 
             // Redirect user based on their role (user_type)
             switch ($user['user_type']) {
                 case 'student':
-                    header("Location: ../student/dashboard.php");
+                    header("Location: ../student/view.php");
                     break;
                 case 'faculty':
-                    header("Location: ../faculty/dashboard.php");
+                    header("Location: ../faculty/view.php");
                     break;
                 case 'staff':
                     header("Location: ../staff/dashboard.php");

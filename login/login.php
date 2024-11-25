@@ -1,8 +1,26 @@
 <?php
-// Start the session to access error messages
+// Start session
 session_start();
-?>
 
+// Redirect logged-in users to their respective dashboards
+if (isset($_SESSION['user_id'])) {
+    switch ($_SESSION['user_type']) {
+        case 'student':
+            header("Location: ../student/view.php");
+            break;
+        case 'faculty':
+            header("Location: ../faculty/view.php");
+            break;
+        case 'staff':
+            header("Location: ../staff/dashboard.php");
+            break;
+        default:
+            header("Location: default_dashboard.php");
+            break;
+    }
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
