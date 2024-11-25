@@ -33,14 +33,26 @@ body {
 
 .form-control {
     background-color: transparent;
-    color: #fff;
+    color: #fff !important; /* Ensure typed text is white */
     border: 1px solid #555;
+}
+
+.form-control::placeholder {
+    color: #aaa; /* Placeholder text is light gray */
 }
 
 .form-control:focus {
     background-color: transparent;
+    color: #fff !important; /* Ensure text remains white on focus */
     border-color: #8bc34a;
     box-shadow: none;
+}
+
+.form-control:-webkit-autofill {
+    background-color: transparent !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important; /* Ensures autofill text is white */
+    box-shadow: 0 0 0px 1000px transparent inset;
 }
 
 .btn-primary {
