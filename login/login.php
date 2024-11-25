@@ -1,3 +1,8 @@
+<?php
+// Start the session to access error messages
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,18 +21,24 @@
             <div class="mb-3">
                 <label for="email" class="form-label">Enter your email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
+                <?php if (isset($_SESSION['email_error'])): ?>
+                    <div class="error-message" style="color: red;">
+                        <?php echo $_SESSION['email_error']; ?>
+                    </div>
+                    <?php unset($_SESSION['email_error']); ?> <!-- Clear the error after displaying -->
+                <?php endif; ?>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Enter your password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
+                <?php if (isset($_SESSION['password_error'])): ?>
+                    <div class="error-message" style="color: red;">
+                        <?php echo $_SESSION['password_error']; ?>
+                    </div>
+                    <?php unset($_SESSION['password_error']); ?> <!-- Clear the error after displaying -->
+                <?php endif; ?>
             </div>
             <button type="submit" name="login" class="btn btn-primary w-100">Log In</button>
-
-            <?php if (isset($error_message)): ?>
-                <div class="error-message">
-                    <?php echo $error_message; ?>
-                </div>
-            <?php endif; ?>
         </form>
     </div>
 
