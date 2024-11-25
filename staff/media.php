@@ -16,21 +16,35 @@ function generateAccessionNumber($resourceType) {
     // Fetch the current year
     $year = date('Y');
     
-    // Generate a prefix based on the resource type
-    $prefix = substr($resourceType, 0, 3); // Use first 3 letters of resource type (e.g., 'Med' for MediaResource)
-    
     // Get the last used accession number from the library resources
     $sql = "SELECT MAX(AccessionNumber) AS max_accession FROM LibraryResources WHERE AccessionNumber LIKE ?";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$prefix . $year . '%']);
+    $stmt->execute(['R' . $year . '%']);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Extract the number and increment it
     $lastNumber = $result['max_accession'];
-    $nextNumber = $lastNumber ? (intval(substr($lastNumber, -4)) + 1) : 1;
+    $nextNumber = $lastNumber ? (intval(substr($lastNumber, -3)) + 1) : 1;
     
-    // Format the new accession number as "PrefixYearXXXX" (e.g., "Med20230001")
-    return $prefix . $year . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    // Format the new accession number as "R-Year-XXXX" (e.g., "R-2023-0001")
+    $newAccessionNumber = 'R-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+    // Check if the generated accession number already exists
+    $sqlCheck = "SELECT COUNT(*) FROM LibraryResources WHERE AccessionNumber = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$newAccessionNumber]);
+    $count = $stmtCheck->fetchColumn();
+
+    // If the number already exists, increment it until a unique number is found
+    while ($count > 0) {
+        $nextNumber++;
+        $newAccessionNumber = 'R-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $stmtCheck->execute([$newAccessionNumber]);
+        $count = $stmtCheck->fetchColumn();
+    }
+
+    // Return the unique accession number
+    return $newAccessionNumber;
 }
 
 // Function to get all media resources
@@ -40,7 +54,7 @@ function getMediaResources() {
         SELECT 
             LR.ResourceID, 
             LR.Title, 
-            LR.Category AS Genre, 
+            LR.Category AS MediaType, 
             LR.AccessionNumber, 
             MR.Format, 
             MR.Runtime, 
@@ -59,7 +73,6 @@ if (isset($_POST['add_media'])) {
     $format = $_POST['format'];
     $runtime = $_POST['runtime'];
     $media_type = $_POST['media_type'];
-    $genre = $_POST['genre'];
 
     // If custom format or media type is added, replace the default with the custom one
     if ($_POST['custom_format']) {
@@ -79,7 +92,7 @@ if (isset($_POST['add_media'])) {
         $sqlLibrary = "INSERT INTO LibraryResources (Title, ResourceType, Category, AccessionNumber) 
                        VALUES (?, 'MediaResource', ?, ?)";
         $stmtLibrary = $pdo->prepare($sqlLibrary);
-        $stmtLibrary->execute([$title, $genre, $accession_number]);
+        $stmtLibrary->execute([$title, $media_type, $accession_number]);
 
         $resourceID = $pdo->lastInsertId(); // Get the ResourceID of the inserted media resource
 
@@ -113,7 +126,6 @@ if (isset($_POST['edit_media'])) {
     $format = $_POST['format'];
     $runtime = $_POST['runtime'];
     $media_type = $_POST['media_type'];
-    $genre = $_POST['genre'];
 
     // If custom format or media type is added, replace the default with the custom one
     if ($_POST['custom_format']) {
@@ -129,7 +141,7 @@ if (isset($_POST['edit_media'])) {
         // Update LibraryResources
         $sqlLibrary = "UPDATE LibraryResources SET Title = ?, Category = ? WHERE ResourceID = ?";
         $stmtLibrary = $pdo->prepare($sqlLibrary);
-        $stmtLibrary->execute([$title, $genre, $resourceID]);
+        $stmtLibrary->execute([$title, $media_type, $resourceID]);
 
         // Update MediaResources
         $sqlMedia = "UPDATE MediaResources SET Format = ?, Runtime = ?, MediaType = ? WHERE ResourceID = ?";
@@ -206,13 +218,6 @@ $mediaResources = getMediaResources();
             <option value="Other">Other</option>
         </select>
         <input type="text" name="custom_media_type" id="custom_media_type" placeholder="Enter custom media type" style="display:none;">
-        
-        <!-- Genre Dropdown -->
-        <select name="genre" required>
-            <option value="Film">Film</option>
-            <option value="Music">Music</option>
-            <option value="AudioBook">Audio Book</option>
-        </select>
 
         <button type="submit" name="add_media">Add Media Resource</button>
     </form>
