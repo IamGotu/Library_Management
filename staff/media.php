@@ -27,7 +27,7 @@ function generateAccessionNumber($resourceType) {
     $nextNumber = $lastNumber ? (intval(substr($lastNumber, -3)) + 1) : 1;
     
     // Format the new accession number as "R-Year-XXXX" (e.g., "R-2023-0001")
-    $newAccessionNumber = 'R-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    $newAccessionNumber = 'R' . '-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
     // Check if the generated accession number already exists
     $sqlCheck = "SELECT COUNT(*) FROM LibraryResources WHERE AccessionNumber = ?";
@@ -38,7 +38,7 @@ function generateAccessionNumber($resourceType) {
     // If the number already exists, increment it until a unique number is found
     while ($count > 0) {
         $nextNumber++;
-        $newAccessionNumber = 'R-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $newAccessionNumber = 'R' . '-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $stmtCheck->execute([$newAccessionNumber]);
         $count = $stmtCheck->fetchColumn();
     }

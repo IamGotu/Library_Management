@@ -11,18 +11,40 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
 include '../config/db.php';
 
 // Function to generate a unique accession number for resources
-function generateAccessionNumber($type) {
-    // Create a prefix based on the type (Media, Periodical, etc.)
-    $prefix = strtoupper(substr($type, 0, 3)); // 'Med' for Media, 'Per' for Periodical, etc.
-
-    // Get the current year
+function generateAccessionNumber($resourceType) {
+    global $pdo;
+    // Fetch the current year
     $year = date('Y');
+    
+    // Get the last used accession number from the library resources
+    $sql = "SELECT MAX(AccessionNumber) AS max_accession FROM LibraryResources WHERE AccessionNumber LIKE ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['P' . $year . '%']);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Extract the number and increment it
+    $lastNumber = $result['max_accession'];
+    $nextNumber = $lastNumber ? (intval(substr($lastNumber, -3)) + 1) : 1;
+    
+    // Format the new accession number as "R-Year-XXXX" (e.g., "R-2023-0001")
+    $newAccessionNumber = 'P' . '-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-    // Generate a random number for uniqueness
-    $random_number = mt_rand(1000, 9999); // You can adjust the range as needed
+    // Check if the generated accession number already exists
+    $sqlCheck = "SELECT COUNT(*) FROM LibraryResources WHERE AccessionNumber = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$newAccessionNumber]);
+    $count = $stmtCheck->fetchColumn();
 
-    // Combine them to form the accession number
-    return $prefix . '-' . $year . '-' . $random_number;
+    // If the number already exists, increment it until a unique number is found
+    while ($count > 0) {
+        $nextNumber++;
+        $newAccessionNumber = 'P' . '-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $stmtCheck->execute([$newAccessionNumber]);
+        $count = $stmtCheck->fetchColumn();
+    }
+
+    // Return the unique accession number
+    return $newAccessionNumber;
 }
 
 // Function to get all periodicals
@@ -32,7 +54,7 @@ function getPeriodicals() {
         SELECT 
             LR.ResourceID, 
             LR.Title, 
-            LR.Category AS Genre, 
+            LR.Category AS Type, 
             P.ISSN, 
             P.Volume, 
             P.Issue, 
@@ -51,7 +73,7 @@ if (isset($_POST['add_periodical'])) {
     $issn = $_POST['issn'];
     $volume = $_POST['volume'];
     $issue = $_POST['issue'];
-    $genre = $_POST['genre'];
+    $type = $_POST['type'];
 
     // Generate accession number
     $accession_number = generateAccessionNumber('Periodical');
@@ -63,7 +85,7 @@ if (isset($_POST['add_periodical'])) {
         $sqlLibrary = "INSERT INTO LibraryResources (Title, ResourceType, Category, AccessionNumber) 
                        VALUES (?, 'Periodical', ?, ?)";
         $stmtLibrary = $pdo->prepare($sqlLibrary);
-        $stmtLibrary->execute([$title, $genre, $accession_number]);
+        $stmtLibrary->execute([$title, $type, $accession_number]);
 
         $resourceID = $pdo->lastInsertId(); // Get the ResourceID of the inserted periodical
 
@@ -97,7 +119,7 @@ if (isset($_POST['edit_periodical'])) {
     $issn = $_POST['issn'];
     $volume = $_POST['volume'];
     $issue = $_POST['issue'];
-    $genre = $_POST['genre'];
+    $type = $_POST['type'];
 
     try {
         $pdo->beginTransaction();
@@ -105,7 +127,7 @@ if (isset($_POST['edit_periodical'])) {
         // Update LibraryResources
         $sqlLibrary = "UPDATE LibraryResources SET Title = ?, Category = ? WHERE ResourceID = ?";
         $stmtLibrary = $pdo->prepare($sqlLibrary);
-        $stmtLibrary->execute([$title, $genre, $resourceID]);
+        $stmtLibrary->execute([$title, $type, $resourceID]);
 
         // Update Periodicals
         $sqlPeriodical = "UPDATE Periodicals SET ISSN = ?, Volume = ?, Issue = ? WHERE ResourceID = ?";
@@ -148,11 +170,13 @@ $periodicals = getPeriodicals();
         <input type="text" name="issn" placeholder="ISSN" required>
         <input type="text" name="volume" placeholder="Volume" required>
         <input type="text" name="issue" placeholder="Issue">
-        <select name="genre" required>
-            <option value="Science">Science</option>
-            <option value="Literature">Literature</option>
-            <option value="Business">Business</option>
-            <option value="History">History</option>
+        <select name="type" required>
+            <option value="Newspaper">Newspaper</option>
+            <option value="Newsletter">Newsletter</option>
+            <option value="Magazine">Magazine</option>
+            <option value="Journal">Journal</option>
+            <option value="Bulletin">Bulletin</option>
+            <option value="Annual">Annual</option>
         </select>
         <button type="submit" name="add_periodical">Add Periodical</button>
     </form>
@@ -168,11 +192,11 @@ $periodicals = getPeriodicals();
             <input type="text" name="issn" value="<?php echo htmlspecialchars($periodical['ISSN']); ?>" required>
             <input type="text" name="volume" value="<?php echo htmlspecialchars($periodical['Volume']); ?>" required>
             <input type="text" name="issue" value="<?php echo htmlspecialchars($periodical['Issue']); ?>">
-            <select name="genre" required>
-                <option value="Science" <?php echo ($periodical['Genre'] == 'Science') ? 'selected' : ''; ?>>Science</option>
-                <option value="Literature" <?php echo ($periodical['Genre'] == 'Literature') ? 'selected' : ''; ?>>Literature</option>
-                <option value="Business" <?php echo ($periodical['Genre'] == 'Business') ? 'selected' : ''; ?>>Business</option>
-                <option value="History" <?php echo ($periodical['Genre'] == 'History') ? 'selected' : ''; ?>>History</option>
+            <select name="type" required>
+                <option value="Science" <?php echo ($periodical['Type'] == 'Science') ? 'selected' : ''; ?>>Journal</option>
+                <option value="Literature" <?php echo ($periodical['Type'] == 'Literature') ? 'selected' : ''; ?>>Literature</option>
+                <option value="Business" <?php echo ($periodical['Type'] == 'Business') ? 'selected' : ''; ?>>Business</option>
+                <option value="History" <?php echo ($periodical['Type'] == 'History') ? 'selected' : ''; ?>>History</option>
             </select>
             <button type="submit" name="edit_periodical">Update Periodical</button>
         </form>
