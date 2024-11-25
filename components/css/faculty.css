@@ -1,0 +1,214 @@
+/* Sidebar container styling */
+.sidebar {
+    width: 350px;
+    height: 100vh;
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s ease-in-out; /* Smooth toggle transition */
+}
+
+/* Collapsed sidebar */
+.sidebar.collapsed {
+    transform: translateX(-100%);
+}
+
+/* Sidebar brand/title styling */
+.sidebar .navbar-brand {
+    font-size: 1.8rem; /* Larger brand text */
+    font-weight: bold;
+    padding: 1.5rem;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid #495057; /* Divider below brand */
+}
+
+/* Sidebar navigation links */
+.sidebar .nav-link {
+    color: #ccc;
+    padding: 15px 20px; /* Increase padding for better spacing */
+    text-decoration: none;
+    font-size: 1.2rem; /* Larger font size for links */
+    font-weight: 500; /* Slightly bolder text */
+}
+
+/* Hover effect for links */
+.sidebar .nav-link:hover {
+    background-color: #8bc34a;
+    color: white;
+    border-radius: 5px; /* Rounded corners for hover effect */
+}
+
+/* Active link styling */
+.sidebar .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px; /* Match hover effect styling */
+}
+
+/* Sidebar item spacing */
+.sidebar .nav-item {
+    margin-bottom: 0.8rem; /* Slightly larger spacing between items */
+}
+
+/* Hamburger menu button */
+#sidebarToggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1050; /* Above the sidebar */
+    font-size: 2rem; /* Larger hamburger icon */
+    color: #343a40;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+#sidebarToggle:hover {
+    color: #007bff;
+}
+
+
+
+
+
+/* Main Content Wrapper */
+.content-wrapper {
+    margin-left: 350px; /* Same as the sidebar width */
+    padding: 20px; /* Add some spacing around the content */
+    transition: margin-left 0.3s ease-in-out; /* Match the sidebar's toggle animation */
+}
+
+/* Responsive Adjustment */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px; /* Narrower sidebar for smaller screens */
+    }
+    .content-wrapper {
+        margin-left: 250px; /* Adjust content for smaller sidebar */
+    }
+}
+
+/* Adjusting the background and overall page design */
+body {
+    background: url('../Image/pexels-element5-1370295.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+    max-width: 900px;
+    margin: 2rem auto;
+    color: #fff;
+}
+
+h2 {
+    color: #ffffff;
+    text-align: center;
+}
+
+/* Styling the form */
+form {
+    margin-bottom: 2rem;
+}
+
+form label {
+    color: #fff;
+}
+
+form input, form select {
+    background-color: rgba(0, 0, 0, 0.6); /* Subtle background for better contrast */
+    color: #ccc; /* Light gray text for better readability */
+    border: 1px solid #8bc34a;
+    border-radius: 5px;
+}
+
+form select option {
+    color: #000; /* Black text for dropdown options to improve visibility */
+    background-color: #fff; /* Ensure options are readable on hover or selection */
+}
+
+form input::placeholder, form select {
+    color: #999; /* Slightly darker gray for placeholders */
+}
+
+form input:focus, form select:focus {
+    background-color: rgba(0, 0, 0, 0.8); /* Slightly darker background on focus */
+    color: #ccc; /* Consistent with regular text */
+    border-color: #8bc34a;
+    box-shadow: none;
+}
+
+/* Search results table */
+table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #555;
+}
+
+table th {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+}
+
+table td {
+    color: #ddd;
+}
+
+a {
+    color: #8bc34a;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Go back button */
+.btn-primary {
+    display: block;
+    width: fit-content;
+    margin: 1rem auto 0;
+    padding: 10px 20px;
+    background-color: #8bc34a;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #7cb342;
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.success-message {
+    color: #8bc34a;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
