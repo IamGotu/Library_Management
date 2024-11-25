@@ -136,90 +136,101 @@ if (isset($_GET['borrow_id'])) {
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Library Resources</title>
-    <link rel="stylesheet" href="/style/style.css"> <!-- Add your CSS file -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../components/css/faculty.css">
+    <link rel="icon" href="../components/image/book.png" type="image/x-icon">
 </head>
 <body>
+    <!-- Navbar -->
+    <?php include 'navbar.php'; ?>
 
-<!-- Navbar -->
-<div class="navbar">
-    <h2>Library Resource Search</h2>
-</div>
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <div class="container">
+            <h2>Library Resource Search</h2>
 
-<!-- Search and Filter Form -->
-<div class="container">
-    <h3>Search for a Library Resource</h3>
-    <form method="GET" action="search.php">
-        <label for="resource_type">Select Resource Type:</label>
-        <select name="resource_type" id="resource_type" onchange="this.form.submit()">
-            <option value="Book" <?php echo ($resourceType == 'Book') ? 'selected' : ''; ?>>Book</option>
-            <option value="MediaResource" <?php echo ($resourceType == 'MediaResource') ? 'selected' : ''; ?>>Media</option>
-            <option value="Periodical" <?php echo ($resourceType == 'Periodical') ? 'selected' : ''; ?>>Periodical</option>
-        </select>
+            <!-- Search and Filter Form -->
+            <form method="GET" action="view.php">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="resource_type" class="form-label">Select Resource Type:</label>
+                        <select name="resource_type" id="resource_type" class="form-select" onchange="this.form.submit()">
+                            <option value="Book" <?php echo ($resourceType == 'Book') ? 'selected' : ''; ?>>Book</option>
+                            <option value="MediaResource" <?php echo ($resourceType == 'MediaResource') ? 'selected' : ''; ?>>Media</option>
+                            <option value="Periodical" <?php echo ($resourceType == 'Periodical') ? 'selected' : ''; ?>>Periodical</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">Search:</label>
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Enter keyword" value="<?php echo htmlspecialchars($searchTerm); ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="category" class="form-label">Category:</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">All Categories</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo htmlspecialchars($category['Category']); ?>" <?php echo ($filterCategory == $category['Category']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($category['Category']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-check mt-3">
+                    <input type="checkbox" class="form-check-input" id="available_only" name="available_only" <?php echo ($availableOnly) ? 'checked' : ''; ?>>
+                    <label for="available_only" class="form-check-label">Available Only</label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>
+            </form>
 
-        <input type="text" name="search" placeholder="Search..." value="<?php echo htmlspecialchars($searchTerm); ?>">
-        
-        <select name="category">
-            <option value="">All Categories</option>
-            <?php foreach ($categories as $category): ?>
-                <option value="<?php echo htmlspecialchars($category['Category']); ?>" <?php echo ($filterCategory == $category['Category']) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($category['Category']); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        
-        <label>
-            <input type="checkbox" name="available_only" <?php echo ($availableOnly) ? 'checked' : ''; ?> />
-            Available Only
-        </label>
-        
-        <button type="submit">Search</button>
-    </form>
+            <!-- Search Results Table -->
+            <h3>Search Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Genre</th>
+                        <th>Accession Number</th>
+                        <th>Availability</th>
+                        <th>Author/Type</th>
+                        <th>Extra Information</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($resources)): ?>
+                        <?php foreach ($resources as $resource): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($resource['Title']); ?></td>
+                                <td><?php echo htmlspecialchars($resource['Genre']); ?></td>
+                                <td><?php echo htmlspecialchars($resource['AccessionNumber']); ?></td>
+                                <td><?php echo htmlspecialchars($resource['AvailabilityStatus'] == 'Available' ? 'Available' : 'Checked Out'); ?></td>
+                                <td><?php echo htmlspecialchars($resource['AuthorOrType']); ?></td>
+                                <td><?php echo htmlspecialchars($resource['ExtraInfo']); ?></td>
+                                <td>
+                                    <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
+                                        <a href="view.php?borrow_id=<?php echo $resource['ResourceID']; ?>" class="btn btn-success btn-sm">Borrow</a>
+                                    <?php else: ?>
+                                        <span>Unavailable</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="7">No resources found.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <!-- Resource List -->
-    <h3>Search Results</h3>
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Genre</th>
-            <th>Accession Number</th>
-            <th>Availability</th>
-            <th>Author/Type</th>
-            <th>Extra Information</th>
-            <th>Action</th>
-        </tr>
-        <?php if (!empty($resources)): ?>
-            <?php foreach ($resources as $resource): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($resource['Title']); ?></td>
-                    <td><?php echo htmlspecialchars($resource['Genre']); ?></td>
-                    <td><?php echo htmlspecialchars($resource['AccessionNumber']); ?></td>
-                    <td><?php echo htmlspecialchars($resource['AvailabilityStatus'] == 'Available' ? 'Available' : 'Checked Out'); ?></td>
-                    <td><?php echo htmlspecialchars($resource['AuthorOrType']); ?></td>
-                    <td><?php echo htmlspecialchars($resource['ExtraInfo']); ?></td>
-                    <td>
-                        <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
-                            <a href="search.php?borrow_id=<?php echo $resource['ResourceID']; ?>">Borrow</a>
-                        <?php else: ?>
-                            <span>Unavailable</span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr><td colspan="7">No resources found.</td></tr>
-        <?php endif; ?>
-    </table>
-
-    <!-- Go Back Button -->
-    <a href="dashboard.php" class="go-back-btn">Go Back to Dashboard</a>
-
-</div> <!-- End Container -->
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
