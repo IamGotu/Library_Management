@@ -19,19 +19,19 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
         SELECT 
             LR.ResourceID, 
             LR.Title, 
-            LR.Category AS Genre, 
+            LR.Category AS Category, 
             LR.AccessionNumber,
             LR.AvailabilityStatus,
             CASE
                 WHEN LR.ResourceType = 'Book' THEN B.PublicationDate
                 WHEN LR.ResourceType = 'Periodical' THEN P.PublicationDate
-                WHEN LR.ResourceType = 'MediaResource' THEN MR.Format
+                WHEN LR.ResourceType = 'MediaResource' THEN MR.RunTime
                 ELSE NULL
             END AS ExtraInfo, 
             CASE
                 WHEN LR.ResourceType = 'Book' THEN B.Author
-                WHEN LR.ResourceType = 'MediaResource' THEN MR.MediaType
-                WHEN LR.ResourceType = 'Periodical' THEN P.Publisher
+                WHEN LR.ResourceType = 'MediaResource' THEN MR.Format
+                WHEN LR.ResourceType = 'Periodical' THEN P.Volume
                 ELSE NULL
             END AS AuthorOrType
         FROM LibraryResources LR
@@ -196,11 +196,19 @@ if (isset($_GET['borrow_id'])) {
                 <thead>
                     <tr>
                         <th>Title</th>
-                        <th>Genre</th>
+                        <th>Category</th>
                         <th>Accession Number</th>
                         <th>Availability</th>
-                        <th>Author/Type</th>
-                        <th>Extra Information</th>
+                        <?php if ($resourceType == 'Book'): ?>
+                            <th>Author</th>
+                            <th>Publication Date</th>
+                        <?php elseif ($resourceType == 'MediaResource'): ?>
+                            <th>Run Time</th>
+                            <th>Media Type</th>
+                        <?php elseif ($resourceType == 'Periodical'): ?>
+                            <th>Volume</th>
+                            <th>Publication Date</th>
+                        <?php endif; ?>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -209,11 +217,19 @@ if (isset($_GET['borrow_id'])) {
                         <?php foreach ($resources as $resource): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($resource['Title']); ?></td>
-                                <td><?php echo htmlspecialchars($resource['Genre']); ?></td>
+                                <td><?php echo htmlspecialchars($resource['Category']); ?></td>
                                 <td><?php echo htmlspecialchars($resource['AccessionNumber']); ?></td>
                                 <td><?php echo htmlspecialchars($resource['AvailabilityStatus'] == 'Available' ? 'Available' : 'Checked Out'); ?></td>
-                                <td><?php echo htmlspecialchars($resource['AuthorOrType']); ?></td>
-                                <td><?php echo htmlspecialchars($resource['ExtraInfo']); ?></td>
+                                <?php if ($resourceType == 'Book'): ?>
+                                    <td><?php echo htmlspecialchars($resource['AuthorOrType'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($resource['ExtraInfo'] ?? 'N/A'); ?></td>
+                                <?php elseif ($resourceType == 'MediaResource'): ?>
+                                    <td><?php echo htmlspecialchars($resource['ExtraInfo'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($resource['AuthorOrType'] ?? 'N/A'); ?></td>
+                                <?php elseif ($resourceType == 'Periodical'): ?>
+                                    <td><?php echo htmlspecialchars($resource['AuthorOrType'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($resource['ExtraInfo'] ?? 'N/A'); ?></td>
+                                <?php endif; ?>
                                 <td>
                                     <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
                                         <a href="view.php?borrow_id=<?php echo $resource['ResourceID']; ?>" class="btn btn-success btn-sm">Borrow</a>

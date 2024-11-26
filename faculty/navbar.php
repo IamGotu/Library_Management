@@ -11,7 +11,7 @@
             <a class="nav-link" href="view.php">Borrow Resources</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="transact.php">Borrowed Resources And Fines</a>
+            <a class="nav-link" href="transact.php">Borrowing And Overdue Fines</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="borrow_history.php">Borrow History</a>

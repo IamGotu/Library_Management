@@ -14,38 +14,36 @@ include '../config/db.php';
 $resourceID = $_GET['resourceID'] ?? null;
 
 if ($resourceID) {
-    // Fetch the resource details based on ResourceID
+    // Fetch the resource details
     $stmt = $pdo->prepare("SELECT * FROM libraryresources WHERE ResourceID = :resourceID");
     $stmt->bindParam(':resourceID', $resourceID, PDO::PARAM_INT);
     $stmt->execute();
     $resource = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check if resource exists
     if (!$resource) {
-        echo "Resource not found. Please check that ResourceID is correct.";
+        echo "Resource not found.";
         exit();
     }
 
-    // Fetch the borrow transaction details for this resource and user
+    // Fetch existing borrow transaction
     $stmt = $pdo->prepare("SELECT * FROM borrow_transactions WHERE user_id = :user_id AND resource_id = :resource_id AND status = 'borrowed'");
     $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->bindParam(':resource_id', $resourceID, PDO::PARAM_INT);
     $stmt->execute();
     $borrowTransaction = $stmt->fetch(PDO::FETCH_ASSOC);
-
 } else {
-    header("Location: search.php");
+    header("Location: view.php");
     exit();
 }
 
-// Handle the borrow process when the user submits the form
+// Handle borrow request
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['accept_conditions']) && $_POST['accept_conditions'] == 'on') {
         if ($resource['AvailabilityStatus'] == 'Available') {
             $borrowDate = date('Y-m-d');
             $dueDate = date('Y-m-d', strtotime('+14 days'));
 
-            // Insert the borrow transaction into the borrow_transactions table
+            // Record the transaction
             $stmt = $pdo->prepare("INSERT INTO borrow_transactions (user_id, resource_id, borrow_date, due_date, status) 
                                     VALUES (:user_id, :resource_id, :borrow_date, :due_date, 'borrowed')");
             $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
@@ -54,105 +52,112 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindParam(':due_date', $dueDate);
             $stmt->execute();
 
-            // Update the availability status of the resource in the LibraryResources table
+            // Update resource availability
             $stmt = $pdo->prepare("UPDATE libraryresources SET AvailabilityStatus = 'Checked Out' WHERE ResourceID = :resourceID");
             $stmt->bindParam(':resourceID', $resourceID, PDO::PARAM_INT);
             $stmt->execute();
 
-            header("Location: search.php");
+            header("Location: view.php");
             exit();
         } else {
-            echo "Sorry, this resource is currently unavailable.";
+            $errorMessage = "This resource is unavailable.";
         }
     } else {
-        echo "You must accept the borrowing terms and conditions before proceeding.";
+        $errorMessage = "You must accept the terms and conditions.";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Borrow Resource</title>
-    <link rel="stylesheet" href="../style/style.css"> <!-- Add your CSS file -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../components/css/faculty.css">
+    <link rel="stylesheet" href="../components/css/sidebar.css">
 </head>
 <body>
 
-<!-- Navbar -->
-<div class="navbar">
-    <h2>Borrow Resource</h2>
-</div>
+<?php include 'navbar.php'; ?>
 
-<!-- Resource Information -->
-<div class="container">
-    <h3>Resource Details</h3>
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <div class="container">
+            <h2>Borrow Resource</h2>
 
-    <?php if ($resource): ?>
-        <table>
-            <tr>
-                <th>Title</th>
-                <td><?php echo htmlspecialchars($resource['Title']); ?></td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td><?php echo htmlspecialchars($resource['Category']); ?></td>
-            </tr>
-            <tr>
-                <th>Accession Number</th>
-                <td><?php echo htmlspecialchars($resource['AccessionNumber']); ?></td>
-            </tr>
-            <tr>
-                <th>Availability</th>
-                <td><?php echo htmlspecialchars($resource['AvailabilityStatus'] == 'Available' ? 'Available' : 'Checked Out'); ?></td>
-            </tr>
+            <!-- Resource Details -->
+            <div class="card-header">
+                <h4>Resource Information</h4>
+            </div>
+            <div class="card-body">
+                <?php if ($resource): ?>
+                    <table>
+                        <tr>
+                            <th>Title</th>
+                            <td><?php echo htmlspecialchars($resource['Title']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Category</th>
+                            <td><?php echo htmlspecialchars($resource['Category']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Accession Number</th>
+                            <td><?php echo htmlspecialchars($resource['AccessionNumber']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Availability</th>
+                            <td><?php echo htmlspecialchars($resource['AvailabilityStatus'] == 'Available' ? 'Available' : 'Checked Out'); ?></td>
+                        </tr>
 
-            <!-- Display Borrow and Due Date if Borrowed -->
-            <?php if ($borrowTransaction): ?>
-                <tr>
-                    <th>Borrow Date</th>
-                    <td><?php echo htmlspecialchars($borrowTransaction['borrow_date']); ?></td>
-                </tr>
-                <tr>
-                    <th>Due Date</th>
-                    <td><?php echo htmlspecialchars($borrowTransaction['due_date']); ?></td>
-                </tr>
+                        <?php if ($borrowTransaction): ?>
+                            <tr>
+                                <th>Borrow Date</th>
+                                <td><?php echo htmlspecialchars($borrowTransaction['borrow_date']); ?></td>
+                            </tr>
+                            <tr>
+                                <th>Due Date</th>
+                                <td><?php echo htmlspecialchars($borrowTransaction['due_date']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+                    </table>
+                <?php else: ?>
+                    <p>Resource details not available.</p>
+                <?php endif; ?>
+            </div>
+
+            <br>
+
+            <!-- Borrow Form -->
+            <?php if ($resource['AvailabilityStatus'] == 'Available' && !$borrowTransaction): ?>
+                <div class="card-header">
+                    <h4>Borrow This Resource</h4>
+                </div>
+                <div class="card-body">
+                    <?php if (isset($errorMessage)): ?>
+                        <div class="alert alert-danger"><?php echo htmlspecialchars($errorMessage); ?></div>
+                    <?php endif; ?>
+                    <form method="POST">
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="accept_conditions" name="accept_conditions" required>
+                            <label for="accept_conditions" class="form-check-label">
+                                I accept the terms and conditions of borrowing.
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Borrow</button>
+                    </form>
+                </div>
+            <?php elseif ($borrowTransaction): ?>
+                <div class="alert alert-info">
+                    You have already borrowed this resource. Borrowed on: <strong><?php echo htmlspecialchars($borrowTransaction['borrow_date']); ?></strong>, Due date: <strong><?php echo htmlspecialchars($borrowTransaction['due_date']); ?></strong>.
+                </div>
             <?php else: ?>
-                <!-- Show Borrow Date and Due Date if Available -->
-                <tr>
-                    <th>Borrow Date</th>
-                    <td><?php echo date('Y-m-d'); ?></td>
-                </tr>
-                <tr>
-                    <th>Due Date</th>
-                    <td><?php echo date('Y-m-d', strtotime('+14 days')); ?></td>
-                </tr>
+                <div class="alert alert-warning">This resource is currently unavailable.</div>
             <?php endif; ?>
-        </table>
+        </div>
+    </div>
 
-        <!-- Borrow Form (if resource is available and not already borrowed) -->
-        <?php if ($resource['AvailabilityStatus'] == 'Available' && !$borrowTransaction): ?>
-            <form method="POST">
-                <label for="accept_conditions">
-                    <input type="checkbox" name="accept_conditions" id="accept_conditions" required>
-                    I accept the terms and conditions of borrowing the resource, including fines for overdue returns.
-                </label>
-                <br>
-                <button type="submit">Borrow This Resource</button>
-            </form>
-        <?php elseif ($borrowTransaction): ?>
-            <p>You have already borrowed this resource. The borrow date is: <?php echo htmlspecialchars($borrowTransaction['borrow_date']); ?> and the due date is: <?php echo htmlspecialchars($borrowTransaction['due_date']); ?>.</p>
-        <?php else: ?>
-            <p>This resource is currently unavailable.</p>
-        <?php endif; ?>
-        
-    <?php else: ?>
-        <p>Resource details could not be found.</p>
-    <?php endif; ?>
-
-    <!-- Go Back Button -->
-    <a href="search.php" class="go-back-btn">Go Back to Search</a>
-</div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

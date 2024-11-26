@@ -57,7 +57,8 @@ function getPeriodicals() {
             LR.Category AS Type, 
             P.ISSN, 
             P.Volume, 
-            P.Issue, 
+            P.Issue,
+            P.PublicationDate,
             LR.AccessionNumber
         FROM LibraryResources LR
         LEFT JOIN Periodicals P ON LR.ResourceID = P.ResourceID
@@ -73,6 +74,7 @@ if (isset($_POST['add_periodical'])) {
     $issn = $_POST['issn'];
     $volume = $_POST['volume'];
     $issue = $_POST['issue'];
+    $publicatonDate = $_POST['publicatonDate'];
     $type = $_POST['type'];
 
     // Generate accession number
@@ -90,10 +92,10 @@ if (isset($_POST['add_periodical'])) {
         $resourceID = $pdo->lastInsertId(); // Get the ResourceID of the inserted periodical
 
         // Insert into Periodicals
-        $sqlPeriodical = "INSERT INTO Periodicals (ResourceID, ISSN, Volume, Issue) 
-                          VALUES (?, ?, ?, ?)";
+        $sqlPeriodical = "INSERT INTO Periodicals (ResourceID, ISSN, Volume, Issue, PublicationDate) 
+                          VALUES (?, ?, ?, ?, ?)";
         $stmtPeriodical = $pdo->prepare($sqlPeriodical);
-        $stmtPeriodical->execute([$resourceID, $issn, $volume, $issue]);
+        $stmtPeriodical->execute([$resourceID, $issn, $volume, $issue, $publicatonDate]);
 
         $pdo->commit();
         echo "Periodical added successfully with Accession Number: $accession_number";
@@ -119,6 +121,7 @@ if (isset($_POST['edit_periodical'])) {
     $issn = $_POST['issn'];
     $volume = $_POST['volume'];
     $issue = $_POST['issue'];
+    $publicatonDate = $_POST['publicatonDate'];
     $type = $_POST['type'];
 
     try {
@@ -130,7 +133,7 @@ if (isset($_POST['edit_periodical'])) {
         $stmtLibrary->execute([$title, $type, $resourceID]);
 
         // Update Periodicals
-        $sqlPeriodical = "UPDATE Periodicals SET ISSN = ?, Volume = ?, Issue = ? WHERE ResourceID = ?";
+        $sqlPeriodical = "UPDATE Periodicals SET ISSN = ?, Volume = ?, Issue = ?, PublicationDate = ? WHERE ResourceID = ?";
         $stmtPeriodical = $pdo->prepare($sqlPeriodical);
         $stmtPeriodical->execute([$issn, $volume, $issue, $resourceID]);
 
@@ -170,6 +173,7 @@ $periodicals = getPeriodicals();
         <input type="text" name="issn" placeholder="ISSN" required>
         <input type="text" name="volume" placeholder="Volume" required>
         <input type="text" name="issue" placeholder="Issue">
+        <input type="date" name="publicatonDate" placeholder="Publication Date">
         <select name="type" required>
             <option value="Newspaper">Newspaper</option>
             <option value="Newsletter">Newsletter</option>
@@ -193,10 +197,12 @@ $periodicals = getPeriodicals();
             <input type="text" name="volume" value="<?php echo htmlspecialchars($periodical['Volume']); ?>" required>
             <input type="text" name="issue" value="<?php echo htmlspecialchars($periodical['Issue']); ?>">
             <select name="type" required>
-                <option value="Science" <?php echo ($periodical['Type'] == 'Science') ? 'selected' : ''; ?>>Journal</option>
-                <option value="Literature" <?php echo ($periodical['Type'] == 'Literature') ? 'selected' : ''; ?>>Literature</option>
-                <option value="Business" <?php echo ($periodical['Type'] == 'Business') ? 'selected' : ''; ?>>Business</option>
-                <option value="History" <?php echo ($periodical['Type'] == 'History') ? 'selected' : ''; ?>>History</option>
+                <option value="Newspaper" <?php echo ($periodical['Type'] == 'Newspaper') ? 'selected' : ''; ?>>Newspaper</option>
+                <option value="Newsletter" <?php echo ($periodical['Type'] == 'Newsletter') ? 'selected' : ''; ?>>Newsletter</option>
+                <option value="Magazine" <?php echo ($periodical['Type'] == 'Magazine') ? 'selected' : ''; ?>>Magazine</option>
+                <option value="Journal" <?php echo ($periodical['Type'] == 'Journal') ? 'selected' : ''; ?>>Journal</option>
+                <option value="Bulletin" <?php echo ($periodical['Type'] == 'Bulletin') ? 'selected' : ''; ?>>Bulletin</option>
+                <option value="Annual" <?php echo ($periodical['Type'] == 'Annual') ? 'selected' : ''; ?>>Annual</option>
             </select>
             <button type="submit" name="edit_periodical">Update Periodical</button>
         </form>
@@ -210,6 +216,8 @@ $periodicals = getPeriodicals();
             <th>ISSN</th>
             <th>Volume</th>
             <th>Issue</th>
+            <th>Publication Date</th>
+            <th>Type</th>
             <th>Accession Number</th>
             <th>Actions</th>
         </tr>
@@ -219,6 +227,8 @@ $periodicals = getPeriodicals();
                 <td><?php echo htmlspecialchars($periodical['ISSN']); ?></td>
                 <td><?php echo htmlspecialchars($periodical['Volume']); ?></td>
                 <td><?php echo htmlspecialchars($periodical['Issue']); ?></td>
+                <td><?php echo htmlspecialchars($periodical['PublicationDate']); ?></td>
+                <td><?php echo htmlspecialchars($periodical['Type']); ?></td>
                 <td><?php echo htmlspecialchars($periodical['AccessionNumber']); ?></td>
                 <td>
                     <a href="periodic.php?edit_periodical=<?php echo $periodical['ResourceID']; ?>">Edit</a>
