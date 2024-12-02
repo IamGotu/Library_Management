@@ -1,0 +1,257 @@
+/* Navigation Bar Container */
+.navbar {
+    width: 100%;
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    justify-content: space-between; /* Space between brand and navigation links */
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+}
+
+/* Navbar Brand */
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+/* Navigation Links Container */
+.nav {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem; /* Space between links */
+    margin: 0;
+    padding: 0;
+}
+
+/* Navigation Links */
+.nav-link {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 8px 15px; /* Add some padding for spacing */
+    border-radius: 5px; /* Rounded hover effect */
+}
+
+/* Hover and Active Styles */
+.nav-link:hover {
+    background-color: #8bc34a;
+    color: white;
+}
+
+.nav-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Logout Link Style */
+.logout-link {
+    background-color: #ff6b6b;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.logout-link:hover {
+    background-color: #ff5252;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column; /* Stack links vertically on smaller screens */
+        gap: 0.5rem;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}
+
+/* ------------------------------------------------------------------------------------------------*/
+
+/* Background Styling */
+body {
+    background: url('../Image/pexels-element5-1370295.jpg') no-repeat center center fixed;
+    background-size: cover; /* Ensures the image covers the entire viewport */
+}
+
+/* Main Content Wrapper */
+.content-wrapper {
+    margin-top: 70px; /* Avoid navbar overlap */
+    padding: 20px; /* Consistent spacing */
+    overflow: hidden; /* Prevent scrolling on the main content */
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle background for the content */
+    color: #fff; /* Light text for readability */
+    font-family: Arial, sans-serif;
+}
+
+/* Scrollable Table Container */
+.table-container {
+    max-height: 400px; /* Fixed height for scrollable area */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: auto; /* Enable horizontal scrolling for wide tables */
+    margin-top: 1rem; /* Space above the table */
+    border: 1px solid #ccc; /* Neutral border color */
+    border-radius: 8px; /* Smooth edges */
+    background-color: rgba(0, 0, 0, 0.7); /* Slightly darker semi-transparent background */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Table Styling */
+table {
+    width: 100%; /* Full width table */
+    border-collapse: collapse; /* Remove cell spacing */
+    color: #eee; /* Light text color */
+    font-size: 0.9rem; /* Slightly smaller text for readability */
+}
+
+table th, table td {
+    padding: 12px; /* Consistent cell padding */
+    text-align: left; /* Left-aligned text */
+    border-bottom: 1px solid #555; /* Subtle row dividers */
+}
+
+table th {
+    background-color: rgba(0, 0, 0, 0.8); /* Darker background for header row */
+    color: #8bc34a; /* Highlighted header text */
+    font-weight: bold; /* Emphasized headers */
+    text-transform: uppercase; /* Header text in uppercase */
+}
+
+table td {
+    background-color: rgba(0, 0, 0, 0.6); /* Alternate background for rows */
+}
+
+/* Hover Effect for Rows */
+table tbody tr:hover {
+    background-color: rgba(139, 195, 74, 0.2); /* Soft green highlight on hover */
+}
+
+/* Scrollbar Styling */
+.table-container::-webkit-scrollbar {
+    width: 10px; /* Width of vertical scrollbar */
+    height: 10px; /* Height of horizontal scrollbar */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #8bc34a; /* Thumb color */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3); /* Track background */
+}
+
+/* Horizontally centered container */
+.centered-heading {
+    text-align: center; /* Center the text horizontally */
+    margin-top: 20px; /* Optional: Add spacing from the top */
+}
+
+/* Styling for the heading */
+.centered-heading h2 {
+    color: #8bc34a; /* White text for visibility */
+    font-size: 3rem; /* Adjust size as needed */
+    padding: 10px 20px; /* Add spacing for better appearance */
+    background-color: rgba(0, 0, 0, 0.8); /* Optional: background for the text */
+    border-radius: 10px; /* Rounded corners */
+    display: inline-block; /* Ensures the background fits the text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+/* Heading Styling */
+h3 {
+    color: #8bc34a; /* Highlighted heading */
+    text-align: center; /* Centered heading */
+    margin-bottom: 1rem; /* Space below heading */
+}
+
+/* Form Label Styling */
+form label {
+    color: #8bc34a; /* Highlighted green text for visibility */
+    font-weight: bold; /* Emphasize the labels */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Subtle shadow for better contrast */
+    margin-bottom: 5px; /* Add spacing below labels */
+    display: block; /* Ensure labels are on their own line */
+}
+
+/* Input and Select Styling */
+form input, form select {
+    color: #000; /* Dark text for readability */
+    background-color: #fff; /* Light background for inputs */
+    border: 1px solid #8bc34a; /* Green accent border */
+    border-radius: 5px; /* Smooth edges */
+    padding: 10px; /* Comfortable padding */
+}
+
+form input:focus, form select:focus {
+    border-color: #7cb342; /* Darker green focus border */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(139, 195, 74, 0.7); /* Subtle glow effect */
+}
+
+/* Submit Button */
+form .btn-primary {
+    background-color: #8bc34a; /* Green background */
+    color: #fff; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Spacing */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Standard font size */
+    font-weight: bold; /* Emphasized text */
+    text-transform: uppercase; /* Uppercase for buttons */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+form .btn-primary:hover {
+    background-color: #7cb342; /* Slightly darker on hover */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Optional Background for Form Section */
+form {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    padding: 20px; /* Add some padding */
+    border-radius: 8px; /* Smooth corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Submit Button */
+.btn-primary {
+    background-color: #8bc34a; /* Green background */
+    color: #fff; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Spacing */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Standard font size */
+    font-weight: bold; /* Emphasized text */
+    text-transform: uppercase; /* Uppercase for buttons */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.btn-primary:hover {
+    background-color: #7cb342; /* Slightly darker on hover */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Feedback Messages */
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.success-message {
+    color: #8bc34a;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}

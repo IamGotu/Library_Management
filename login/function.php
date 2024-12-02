@@ -27,13 +27,16 @@ if (isset($_POST['login'])) {
             // Redirect user based on their role (user_type)
             switch ($user['user_type']) {
                 case 'student':
-                    header("Location: ../student/view.php");
+                    header("Location: ../borrower/view.php");
                     break;
                 case 'faculty':
-                    header("Location: ../faculty/view.php");
+                    header("Location: ../borrower/view.php");
                     break;
                 case 'staff':
                     header("Location: ../staff/dashboard.php");
+                    break;
+                case 'admin':
+                    header("Location: ../admin/dashboard.php");
                     break;
                 default:
                     header("Location: default_dashboard.php");
