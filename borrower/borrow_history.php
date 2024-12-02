@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is a faculty
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'faculty') {
+// Check if the user is logged in and is either a faculty or a student
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['faculty', 'student'])) {
     header("Location: ../login/login.php");
     exit();
 }
