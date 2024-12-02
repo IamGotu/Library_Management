@@ -1,0 +1,153 @@
+/* Navigation Bar Container */
+.navbar {
+    width: 100%;
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    justify-content: space-between; /* Space between brand and navigation links */
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+}
+
+/* Navbar Brand */
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+/* Navigation Links Container */
+.nav {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem; /* Space between links */
+    margin: 0;
+    padding: 0;
+}
+
+/* Navigation Links */
+.nav-link {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 8px 15px; /* Add some padding for spacing */
+    border-radius: 5px; /* Rounded hover effect */
+}
+
+/* Hover and Active Styles */
+.nav-link:hover {
+    background-color: #8bc34a;
+    color: white;
+}
+
+.nav-link.active {
+    background-color: #8bc34a;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column; /* Stack links vertically on smaller screens */
+        gap: 0.5rem;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}
+
+/* ------------------------------------------------------------------------------------------------*/
+
+/* Body Styling */
+body {
+    background: url('../Image/pexels-element5-1370295.jpg') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    margin-top: 70px; /* Avoid navbar overlap */
+    padding: 20px; /* Consistent spacing */
+    overflow: hidden; /* Prevent scrolling on the main content */
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle background for the content */
+    color: #8bc34a; /* Light text for readability */
+    font-family: Arial, sans-serif;
+}
+
+/* Profile Section (Read-Only) */
+.profile-info {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    border-radius: 10px; /* Rounded corners */
+    margin-bottom: 30px;
+}
+
+/* Update Password Section */
+.update-password {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Horizontally centered container */
+.centered-heading {
+    text-align: center; /* Center the text horizontally */
+    margin-top: 20px; /* Optional: Add spacing from the top */
+}
+
+/* Styling for the heading */
+.centered-heading h2 {
+    color: #8bc34a; /* White text for visibility */
+    font-size: 3rem; /* Adjust size as needed */
+    padding: 10px 20px; /* Add spacing for better appearance */
+    background-color: rgba(0, 0, 0, 0.8); /* Optional: background for the text */
+    border-radius: 10px; /* Rounded corners */
+    display: inline-block; /* Ensures the background fits the text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+/* Form Styling */
+form input, form select {
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #8bc34a;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+form input:focus {
+    border-color: #7cb342;
+    outline: none;
+    box-shadow: 0 0 5px rgba(139, 195, 74, 0.7);
+}
+
+/* Button Styling */
+.btn-primary, form .btn-success {
+    background-color: #8bc34a; /* Green background */
+    color: #fff; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Spacing */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Standard font size */
+    font-weight: bold; /* Emphasized text */
+    text-transform: uppercase; /* Uppercase for buttons */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.btn-primary:hover, form .btn-success:hover {
+    background-color: #7cb342; /* Slightly darker on hover */
+    cursor: pointer; /* Pointer cursor */
+}

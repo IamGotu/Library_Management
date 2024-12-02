@@ -33,10 +33,10 @@ if (isset($_POST['login'])) {
                     header("Location: ../borrower/view.php");
                     break;
                 case 'staff':
-                    header("Location: ../staff/dashboard.php");
+                    header("Location: ../staff/view.php");
                     break;
                 case 'admin':
-                    header("Location: ../admin/dashboard.php");
+                    header("Location: ../admin/view.php");
                     break;
                 default:
                     header("Location: default_dashboard.php");

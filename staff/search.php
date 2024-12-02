@@ -1,7 +1,7 @@
-<?php
+<?php 
 session_start();
 
-// Check if the user is logged in and is a staff member
+// Check if the user is logged in and is a student (not staff)
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
     header("Location: ../login/login.php");
     exit();
@@ -14,7 +14,6 @@ include '../config/db.php';
 function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory = '', $availableOnly = false) {
     global $pdo;
     
-    // Start building the base SQL query
     $sql = "
         SELECT 
             LR.ResourceID, 
@@ -41,7 +40,6 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
         WHERE LR.ResourceType = :resourceType
     ";
 
-    // Apply search term filtering based on resource type
     if (!empty($searchTerm)) {
         if ($resourceType == 'Book') {
             $sql .= " AND (LR.Title LIKE :searchTerm OR B.Author LIKE :searchTerm OR B.ISBN LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
@@ -52,12 +50,10 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
         }
     }
 
-    // Apply category filter if specified
     if (!empty($filterCategory)) {
         $sql .= " AND LR.Category = :filterCategory";
     }
 
-    // Apply availability filter if selected
     if ($availableOnly) {
         $sql .= " AND LR.AvailabilityStatus = 'Available'";
     }
@@ -65,7 +61,6 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':resourceType', $resourceType);
 
-    // Bind parameters based on provided filters
     if (!empty($searchTerm)) {
         $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%');
     }
@@ -77,7 +72,7 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Function to get categories based on resource type
+// Function to get categories by resource type
 function getCategoriesByResourceType($resourceType) {
     global $pdo;
     if ($resourceType == 'Book') {
@@ -87,7 +82,7 @@ function getCategoriesByResourceType($resourceType) {
     } elseif ($resourceType == 'MediaResource') {
         $sql = "SELECT DISTINCT Category FROM LibraryResources WHERE ResourceType = 'MediaResource'";
     } else {
-        $sql = "SELECT DISTINCT Category FROM LibraryResources";  // All categories if no specific type
+        $sql = "SELECT DISTINCT Category FROM LibraryResources";
     }
 
     $stmt = $pdo->prepare($sql);
@@ -99,15 +94,41 @@ function getCategoriesByResourceType($resourceType) {
 $searchTerm = $_GET['search'] ?? '';
 $filterCategory = $_GET['category'] ?? '';
 $availableOnly = isset($_GET['available_only']);
-$resourceType = $_GET['resource_type'] ?? 'Book'; // Default to 'Book' if no resource type is selected
+$resourceType = $_GET['resource_type'] ?? 'Book';
 
-// Get the search results
 $resources = searchLibraryResources($resourceType, $searchTerm, $filterCategory, $availableOnly);
-
-// Get the list of categories based on resource type
 $categories = getCategoriesByResourceType($resourceType);
-?>
 
+// Handle borrow action
+// Handle borrow action
+if (isset($_GET['borrow_id'])) {
+    $resourceID = $_GET['borrow_id'];
+    $userID = $_SESSION['user_id'];
+
+    // Check student's borrowed items count
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS borrowed_count FROM borrow_transactions WHERE user_id = :userID AND return_date IS NULL");
+    $stmt->bindValue(':userID', $userID);
+    $stmt->execute();
+    $borrowedCount = $stmt->fetch(PDO::FETCH_ASSOC)['borrowed_count'];
+
+    if ($borrowedCount >= 3) {
+        echo "Please return the previously borrowed books before borrowing a new book.";
+    } else {
+        $stmt = $pdo->prepare("SELECT AvailabilityStatus FROM libraryresources WHERE ResourceID = :resourceID");
+        $stmt->bindValue(':resourceID', $resourceID);
+        $stmt->execute();
+        $resource = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($resource['AvailabilityStatus'] == 'Available') {
+            header("Location: borrow.php?resourceID=$resourceID&resourceType=$resourceType");
+            exit();
+        } else {
+            echo "This resource is currently unavailable.";
+        }
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,7 +147,7 @@ $categories = getCategoriesByResourceType($resourceType);
 <!-- Search and Filter Form -->
 <div class="container">
     <h3>Search for a Library Resource</h3>
-    <form method="GET" action="book.php">
+    <form method="GET" action="search.php">
         <label for="resource_type">Select Resource Type:</label>
         <select name="resource_type" id="resource_type" onchange="this.form.submit()">
             <option value="Book" <?php echo ($resourceType == 'Book') ? 'selected' : ''; ?>>Book</option>
@@ -146,7 +167,7 @@ $categories = getCategoriesByResourceType($resourceType);
         </select>
         
         <label>
-            <input type="checkbox" name="available_only" <?php echo ($availableOnly) ? 'checked' : ''; ?>>
+            <input type="checkbox" name="available_only" <?php echo ($availableOnly) ? 'checked' : ''; ?> />
             Available Only
         </label>
         
@@ -163,6 +184,7 @@ $categories = getCategoriesByResourceType($resourceType);
             <th>Availability</th>
             <th>Author/Type</th>
             <th>Extra Information</th>
+            <th>Action</th>
         </tr>
         <?php if (!empty($resources)): ?>
             <?php foreach ($resources as $resource): ?>
@@ -173,10 +195,17 @@ $categories = getCategoriesByResourceType($resourceType);
                     <td><?php echo htmlspecialchars($resource['AvailabilityStatus'] == 'Available' ? 'Available' : 'Checked Out'); ?></td>
                     <td><?php echo htmlspecialchars($resource['AuthorOrType']); ?></td>
                     <td><?php echo htmlspecialchars($resource['ExtraInfo']); ?></td>
+                    <td>
+                        <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
+                            <a href="search.php?borrow_id=<?php echo $resource['ResourceID']; ?>">Borrow</a>
+                        <?php else: ?>
+                            <span>Unavailable</span>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="6">No resources found.</td></tr>
+            <tr><td colspan="7">No resources found.</td></tr>
         <?php endif; ?>
     </table>
 

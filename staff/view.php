@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is either a faculty or a student
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['faculty', 'student'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['staff'])) {
     header("Location: ../login/login.php");
     exit();
 }
@@ -48,7 +48,7 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
         } elseif ($resourceType == 'MediaResource') {
             $sql .= " AND (LR.Title LIKE :searchTerm OR MR.MediaType LIKE :searchTerm OR MR.Format LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
         } elseif ($resourceType == 'Periodical') {
-            $sql .= " AND (LR.Title LIKE :searchTerm OR P.Publisher LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
+            $sql .= " AND (LR.Title LIKE :searchTerm OR P.Volume LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
         }
     }
 
@@ -136,7 +136,7 @@ $categories = getCategoriesByResourceType($resourceType);
                     </div>
                     <div class="col-md-4">
                         <label for="search" class="form-label">Search:</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Enter keyword" value="<?php echo htmlspecialchars($searchTerm); ?>">
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Accession Number | Title | Author | Media Type" value="<?php echo htmlspecialchars($searchTerm); ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="category" class="form-label">Category:</label>
@@ -151,6 +151,17 @@ $categories = getCategoriesByResourceType($resourceType);
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>
+                <button 
+                    type="button" 
+                    class="btn btn-secondary mt-3 w-100" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#borrowTransactionModal"
+                    data-resource-type="Book" 
+                    data-accession-number="ACC12345" 
+                    data-borrow-id="123"
+                    data-resource-id="456"> <!-- Ensure you add the resource-id here -->
+                    Borrow
+                </button>
             </form>
 
             <!-- Search Results Table -->
@@ -200,8 +211,77 @@ $categories = getCategoriesByResourceType($resourceType);
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Borrow Transaction Modal -->
+            <div class="modal" id="borrowTransactionModal" tabindex="-1" aria-labelledby="borrowTransactionModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="borrowTransactionModalLabel">Borrow Transaction Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="borrowTransactionForm">
+                                <!-- Borrower Details -->
+                                <div class="mb-3">
+                                    <label for="borrowerId" class="form-label">Borrower</label>
+                                    <input type="text" class="form-control" id="borrowerId" name="borrower_id">
+                                    <div id="borrowerError" class="text-danger"></div>
+                                </div>
+
+                                <!-- Approver Details -->
+                                <div class="mb-3">
+                                    <label for="approverId" class="form-label">Approver</label>
+                                    <input type="text" class="form-control" id="approverId" name="approver_id" readonly>
+                                </div>
+
+                                <!-- Resource Type -->
+                                <div class="mb-3">
+                                    <label for="resourceType" class="form-label">Resource Type</label>
+                                    <select class="form-select" id="resourceType" name="resource_type">
+                                        <option value="Book">Book</option>
+                                        <option value="MediaResource">Media Resource</option>
+                                        <option value="Periodical">Periodical</option>
+                                    </select>
+                                </div>
+
+                                <!-- Accession Number -->
+                                <div class="mb-3">
+                                    <label for="accessionNumber" class="form-label">Accession Number</label>
+                                    <input type="text" class="form-control" id="accessionNumber" name="accession_number">
+                                </div>
+
+                                <!-- Borrow and Due Dates -->
+                                <div class="mb-3">
+                                    <label for="borrowDate" class="form-label">Borrow Date</label>
+                                    <input type="date" class="form-control" id="borrowDate" name="borrow_date" readonly>
+                                </div>
+
+                                <!-- Return Date -->
+                                <div class="mb-3">
+                                    <label for="returnDate" class="form-label">Return Date</label>
+                                    <input type="date" class="form-control" id="returnDate" name="return_date" readonly>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <input type="text" class="form-control" id="status" name="status" value="borrowed" placeholder="Borrowed" readonly>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
+    <!-- Bootstrap Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
