@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2024 at 06:01 PM
+-- Generation Time: Dec 02, 2024 at 07:27 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,16 +60,16 @@ INSERT INTO `books` (`BookID`, `Title`, `Author`, `ISBN`, `Publisher`, `Edition`
 --
 
 CREATE TABLE `borrow_transactions` (
-  `id` int(11) NOT NULL,
-  `borrower_id` int(11) NOT NULL COMMENT 'User ID or name of faculty/student who borrowed',
-  `approver_id` int(11) NOT NULL COMMENT 'User ID or name of staff who approved the borrowing',
-  `resource_type` enum('Book','MediaResource','Periodical') NOT NULL COMMENT 'Type of the resource',
-  `resource_id` int(11) NOT NULL COMMENT 'ID of the borrowed resource',
-  `accession_number` varchar(50) NOT NULL COMMENT 'Accession number of the borrowed resource',
-  `borrow_date` date NOT NULL COMMENT 'Date when the resource was borrowed',
-  `due_date` date NOT NULL COMMENT 'Date when the resource is due to be returned',
-  `return_date` date DEFAULT NULL COMMENT 'Date when the resource was returned',
-  `status` enum('borrowed','returned','overdue') DEFAULT 'borrowed' COMMENT 'Status of the borrowing transaction'
+  `ID` int(11) NOT NULL,
+  `BorrowerID` int(11) NOT NULL,
+  `ApproverID` int(11) NOT NULL,
+  `ResourceID` int(11) NOT NULL,
+  `ResourceType` enum('Book','MediaResource','Periodical') NOT NULL,
+  `AccessionNumber` varchar(50) NOT NULL,
+  `borrow_date` date NOT NULL,
+  `due_date` date NOT NULL,
+  `return_date` date DEFAULT NULL,
+  `status` enum('borrowed','returned','overdue') DEFAULT 'borrowed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tracks borrowing transactions for library resources';
 
 -- --------------------------------------------------------
@@ -209,11 +209,11 @@ ALTER TABLE `books`
 -- Indexes for table `borrow_transactions`
 --
 ALTER TABLE `borrow_transactions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `borrower_id` (`borrower_id`),
-  ADD KEY `approver_id` (`approver_id`),
-  ADD KEY `resource_id` (`resource_id`),
-  ADD KEY `accession_number` (`accession_number`);
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `ResourceID` (`ResourceID`),
+  ADD KEY `borrower_id` (`BorrowerID`),
+  ADD KEY `approver_id` (`ApproverID`),
+  ADD KEY `accession_number` (`AccessionNumber`);
 
 --
 -- Indexes for table `libraryresources`
@@ -259,7 +259,7 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `borrow_transactions`
 --
 ALTER TABLE `borrow_transactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `libraryresources`

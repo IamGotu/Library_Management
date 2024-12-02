@@ -12,7 +12,7 @@ if (isset($_SESSION['user_id'])) {
             header("Location: ../faculty/view.php");
             break;
         case 'staff':
-            header("Location: ../staff/dashboard.php");
+            header("Location: ../staff/view.php");
             break;
         default:
             header("Location: default_dashboard.php");

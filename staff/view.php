@@ -151,17 +151,6 @@ $categories = getCategoriesByResourceType($resourceType);
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>
-                <button 
-                    type="button" 
-                    class="btn btn-secondary mt-3 w-100" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#borrowTransactionModal"
-                    data-resource-type="Book" 
-                    data-accession-number="ACC12345" 
-                    data-borrow-id="123"
-                    data-resource-id="456"> <!-- Ensure you add the resource-id here -->
-                    Borrow
-                </button>
             </form>
 
             <!-- Search Results Table -->
@@ -183,6 +172,7 @@ $categories = getCategoriesByResourceType($resourceType);
                                 <th>Volume</th>
                                 <th>Publication Date</th>
                             <?php endif; ?>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -203,6 +193,13 @@ $categories = getCategoriesByResourceType($resourceType);
                                         <td><?php echo htmlspecialchars($resource['AuthorOrType'] ?? 'N/A'); ?></td>
                                         <td><?php echo htmlspecialchars($resource['ExtraInfo'] ?? 'N/A'); ?></td>
                                     <?php endif; ?>
+                                    <td>
+                                        <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
+                                            <a href="./transactions/borrow.php?resourceID=<?php echo $resource['ResourceID']; ?>" class="btn btn-primary mt-3 w-100">Borrow</a>
+                                        <?php else: ?>
+                                            <span class="btn btn-secondary mt-3 w-100">Unavailable</span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -210,75 +207,7 @@ $categories = getCategoriesByResourceType($resourceType);
                         <?php endif; ?>
                     </tbody>
                 </table>
-            </div>
-            
-            <!-- Borrow Transaction Modal -->
-            <div class="modal" id="borrowTransactionModal" tabindex="-1" aria-labelledby="borrowTransactionModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="borrowTransactionModalLabel">Borrow Transaction Details</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="borrowTransactionForm">
-                                <!-- Borrower Details -->
-                                <div class="mb-3">
-                                    <label for="borrowerId" class="form-label">Borrower</label>
-                                    <input type="text" class="form-control" id="borrowerId" name="borrower_id">
-                                    <div id="borrowerError" class="text-danger"></div>
-                                </div>
-
-                                <!-- Approver Details -->
-                                <div class="mb-3">
-                                    <label for="approverId" class="form-label">Approver</label>
-                                    <input type="text" class="form-control" id="approverId" name="approver_id" readonly>
-                                </div>
-
-                                <!-- Resource Type -->
-                                <div class="mb-3">
-                                    <label for="resourceType" class="form-label">Resource Type</label>
-                                    <select class="form-select" id="resourceType" name="resource_type">
-                                        <option value="Book">Book</option>
-                                        <option value="MediaResource">Media Resource</option>
-                                        <option value="Periodical">Periodical</option>
-                                    </select>
-                                </div>
-
-                                <!-- Accession Number -->
-                                <div class="mb-3">
-                                    <label for="accessionNumber" class="form-label">Accession Number</label>
-                                    <input type="text" class="form-control" id="accessionNumber" name="accession_number">
-                                </div>
-
-                                <!-- Borrow and Due Dates -->
-                                <div class="mb-3">
-                                    <label for="borrowDate" class="form-label">Borrow Date</label>
-                                    <input type="date" class="form-control" id="borrowDate" name="borrow_date" readonly>
-                                </div>
-
-                                <!-- Return Date -->
-                                <div class="mb-3">
-                                    <label for="returnDate" class="form-label">Return Date</label>
-                                    <input type="date" class="form-control" id="returnDate" name="return_date" readonly>
-                                </div>
-
-                                <!-- Status -->
-                                <div class="mb-3">
-                                    <label for="status" class="form-label">Status</label>
-                                    <input type="text" class="form-control" id="status" name="status" value="borrowed" placeholder="Borrowed" readonly>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
+            </div>            
         </div>
     </div>
     <!-- Bootstrap Script -->
