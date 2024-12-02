@@ -56,13 +56,6 @@ body {
     box-shadow: none;
 }
 
-.form-control:-webkit-autofill {
-    background-color: transparent !important;
-    color: #fff !important;
-    -webkit-text-fill-color: #fff !important; /* Ensures autofill text is white */
-    box-shadow: 0 0 0px 1000px transparent inset;
-}
-
 /* Button styling */
 .btn-primary {
     background-color: #8bc34a;
