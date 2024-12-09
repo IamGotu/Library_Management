@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2024 at 11:15 AM
+-- Generation Time: Dec 09, 2024 at 06:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -78,6 +78,22 @@ CREATE TABLE `borrow_transactions` (
   `status` enum('borrowed','returned','overdue') DEFAULT 'borrowed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tracks borrowing transactions for library resources';
 
+--
+-- Dumping data for table `borrow_transactions`
+--
+
+INSERT INTO `borrow_transactions` (`ID`, `BorrowerID`, `Borrower_first_name`, `Borrower_middle_name`, `Borrower_last_name`, `Borrower_suffix`, `ApproverID`, `Approver_first_name`, `Approver_middle_name`, `Approver_last_name`, `Approver_suffix`, `ResourceID`, `ResourceType`, `AccessionNumber`, `borrow_date`, `due_date`, `return_date`, `status`) VALUES
+(21, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 78, 'Book', 'B-2024-001', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(24, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 78, 'Book', 'B-2024-001', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(25, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 79, 'Book', 'B-2024-002', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(26, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 80, 'Book', 'B-2024-003', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(27, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 118, 'Periodical', 'P-2024-001', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(28, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 107, 'MediaResource', 'R-2024-002', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(29, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 78, 'Book', 'B-2024-001', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(30, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 79, 'Book', 'B-2024-002', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(31, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 78, 'Book', 'B-2024-001', '2024-12-09', '2024-12-23', '2024-12-09', 'returned'),
+(34, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 118, 'Periodical', 'P-2024-001', '2024-10-09', '2024-10-23', '2024-12-09', 'returned');
+
 -- --------------------------------------------------------
 
 --
@@ -86,12 +102,29 @@ CREATE TABLE `borrow_transactions` (
 
 CREATE TABLE `fines` (
   `ID` int(11) NOT NULL,
-  `BorrowerID` int(100) NOT NULL,
   `BorrowTransactionID` int(11) NOT NULL,
+  `BorrowerID` int(100) NOT NULL,
+  `Borrower_first_name` varchar(255) NOT NULL,
+  `Borrower_middle_name` varchar(255) DEFAULT NULL,
+  `Borrower_last_name` varchar(255) NOT NULL,
+  `Borrower_suffix` varchar(255) DEFAULT NULL,
+  `ApproverID` int(100) NOT NULL,
+  `Approver_first_name` varchar(255) NOT NULL,
+  `Approver_middle_name` varchar(255) DEFAULT NULL,
+  `Approver_last_name` varchar(255) NOT NULL,
+  `Approver_suffix` varchar(100) DEFAULT NULL,
   `Amount` decimal(10,2) NOT NULL,
   `DateGenerated` date NOT NULL DEFAULT curdate(),
+  `DatePaid` date DEFAULT NULL,
   `PaidStatus` enum('unpaid','paid') NOT NULL DEFAULT 'unpaid'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fines`
+--
+
+INSERT INTO `fines` (`ID`, `BorrowTransactionID`, `BorrowerID`, `Borrower_first_name`, `Borrower_middle_name`, `Borrower_last_name`, `Borrower_suffix`, `ApproverID`, `Approver_first_name`, `Approver_middle_name`, `Approver_last_name`, `Approver_suffix`, `Amount`, `DateGenerated`, `DatePaid`, `PaidStatus`) VALUES
+(7, 34, 4008485, 'student', 'student', 'student', '', 2007136, 'staff', 'staff', 'staff', '', 2350.00, '2024-12-10', '2024-12-09', 'paid');
 
 -- --------------------------------------------------------
 
@@ -121,7 +154,7 @@ INSERT INTO `libraryresources` (`ResourceID`, `Title`, `AccessionNumber`, `Categ
 (107, 'The Shawshank Redemption', 'R-2024-002', 'Film', 'MediaResource', 'Available'),
 (108, 'Thriller by Michael Jackson', 'R-2024-003', 'Music', 'MediaResource', 'Available'),
 (109, 'The Godfather Trilogy', 'R-2024-004', 'Film', 'MediaResource', 'Available'),
-(118, 'The Global Times', 'P-2024-001', 'Newspaper', 'Periodical', 'Available'),
+(118, 'The Global Times', 'P-2024-001', 'Newspaper', 'Periodical', 'Checked Out'),
 (119, 'Tech Insider Weekly', 'P-2024-002', 'Newsletter', 'Periodical', 'Available'),
 (120, 'Style & Design Magazine', 'P-2024-003', 'Magazine', 'Periodical', 'Available'),
 (122, 'Corporate Insights Bulletin', 'P-2024-005', 'Bulletin', 'Periodical', 'Available'),
@@ -210,10 +243,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `suffix`, `email`, `user_type`, `borrow_limit`, `date_of_birth`, `street`, `purok`, `barangay`, `city`, `phone_number`, `status`, `membership_id`, `password`, `created_at`, `updated_at`) VALUES
-(1, 'Mark John', 'Rama', 'Jopia', '', 'admin@gmail.com', 'admin', NULL, '2001-06-14', 'Brgy. Sinawal', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '1003679', '$2y$10$CUJzdLvfCpQZLenJ/gW.Z.G6Xiu8dNnLwsIOFcxgq9NceznjOustK', '2024-12-02 13:48:00', '2024-12-02 13:53:33'),
-(2, 'Mark John', 'Rama', 'Jopia', '', 'staff@gmail.com', 'staff', NULL, '2001-06-14', 'Blck. 3', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '2007136', '$2y$10$ueFwbuMC55wyCGnSllj6A.b2ILKnYoHWSfu07UosCZMHGfYQLDB/O', '2024-11-25 12:53:20', '2024-12-02 15:53:40'),
-(3, 'Mark John', 'Rama', 'Jopia', '', 'faculty@gmail.com', 'faculty', NULL, '2001-06-14', 'Brgy. Sinawal', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '3003212', '$2y$10$Tp2aiMpMjulz/6iGGYaPIu8AyrOEjR1dcgoXGGx9nGbu3OCvQIV..', '2024-12-02 13:50:18', '2024-12-02 14:05:47'),
-(4, 'Mark John', 'Rama', 'Jopia', '', 'student@gmail.com', 'student', NULL, '2001-06-14', 'Blck. 3', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '4008485', '$2y$10$qg8olo7U0gEOvuBUsktOUeW5dQgy36EyD0A5q.Okzd1XQRgk6M/da', '2024-11-25 12:55:45', '2024-12-02 13:54:37');
+(1, 'admin', 'admin', 'admin', '', 'admin@gmail.com', 'admin', NULL, '2001-06-14', 'Brgy. Sinawal', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '1003679', '$2y$10$CUJzdLvfCpQZLenJ/gW.Z.G6Xiu8dNnLwsIOFcxgq9NceznjOustK', '2024-12-02 13:48:00', '2024-12-09 10:51:37'),
+(2, 'staff', 'staff', 'staff', '', 'staff@gmail.com', 'staff', NULL, '2001-06-14', 'Blck. 3', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '2007136', '$2y$10$ueFwbuMC55wyCGnSllj6A.b2ILKnYoHWSfu07UosCZMHGfYQLDB/O', '2024-11-25 12:53:20', '2024-12-09 10:51:53'),
+(3, 'faculty', 'faculty', 'faculty', '', 'faculty@gmail.com', 'faculty', NULL, '2001-06-14', 'Brgy. Sinawal', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '3003212', '$2y$10$Tp2aiMpMjulz/6iGGYaPIu8AyrOEjR1dcgoXGGx9nGbu3OCvQIV..', '2024-12-02 13:50:18', '2024-12-09 10:52:10'),
+(4, 'student', 'student', 'student', '', 'student@gmail.com', 'student', NULL, '2001-06-14', 'Blck. 3', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '4008485', '$2y$10$qg8olo7U0gEOvuBUsktOUeW5dQgy36EyD0A5q.Okzd1XQRgk6M/da', '2024-11-25 12:55:45', '2024-12-09 10:52:20');
 
 --
 -- Indexes for dumped tables
@@ -231,7 +264,6 @@ ALTER TABLE `books`
 --
 ALTER TABLE `borrow_transactions`
   ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `ResourceID` (`ResourceID`),
   ADD KEY `borrower_id` (`BorrowerID`),
   ADD KEY `approver_id` (`ApproverID`),
   ADD KEY `accession_number` (`AccessionNumber`);
@@ -288,13 +320,13 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `borrow_transactions`
 --
 ALTER TABLE `borrow_transactions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `fines`
 --
 ALTER TABLE `fines`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `libraryresources`
@@ -347,4 +379,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-

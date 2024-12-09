@@ -20,7 +20,7 @@ if (!$transactionID) {
 
 // Fetch the borrow transaction details
 $stmt = $pdo->prepare("
-    SELECT ID, BorrowerID, due_date 
+    SELECT ID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, due_date 
     FROM borrow_transactions 
     WHERE ID = :transactionID
 ");
@@ -50,11 +50,15 @@ $fee = $daysOverdue * 50;
 
 // Log the fee in the fines table
 $stmt = $pdo->prepare("
-    INSERT INTO fines (BorrowTransactionID, BorrowerID, Amount) 
-    VALUES (:transactionID, :borrowerID, :fee)
+    INSERT INTO fines (BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, Amount) 
+    VALUES (:transactionID, :borrowerID, :firstName, :middleName, :lastName, :suffix, :fee)
 ");
 $stmt->bindParam(':transactionID', $transactionID, PDO::PARAM_INT);
 $stmt->bindParam(':borrowerID', $borrowerID, PDO::PARAM_INT);
+$stmt->bindParam(':firstName', $transaction['Borrower_first_name']);
+$stmt->bindParam(':middleName', $transaction['Borrower_middle_name']);
+$stmt->bindParam(':lastName', $transaction['Borrower_last_name']);
+$stmt->bindParam(':suffix', $transaction['Borrower_suffix']);
 $stmt->bindParam(':fee', $fee);
 $stmt->execute();
 

@@ -1,0 +1,40 @@
+@media print {
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .receipt {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #000;
+        background-color: #f9f9f9;
+    }
+    
+    h2 {
+        text-align: center;
+    }
+
+    .receipt p {
+        margin: 5px 0;
+    }
+
+    .receipt .text-center {
+        text-align: center;
+    }
+    
+    /* Remove the print button */
+    .text-center button {
+        display: none;
+    }
+
+    /* Hide the back button when printing */
+    @media print {
+        .btn-secondary {
+            display: none;
+        }
+    }
+}

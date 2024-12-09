@@ -12,9 +12,7 @@
         <li class="nav-item">
             <a class="nav-link" href="/staff/transactions/fine.php">Overdue Fine</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/staff/borrow_history.php">Borrow History</a>
-        </li>
+
         <!-- User Name and Profile -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
