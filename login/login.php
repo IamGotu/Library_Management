@@ -6,13 +6,16 @@ session_start();
 if (isset($_SESSION['user_id'])) {
     switch ($_SESSION['user_type']) {
         case 'student':
-            header("Location: ../student/view.php");
+            header("Location: ../borrower/view.php");
             break;
         case 'faculty':
-            header("Location: ../faculty/view.php");
+            header("Location: ../borrower/view.php");
             break;
         case 'staff':
             header("Location: ../staff/view.php");
+            break;
+        case 'admin':
+            header("Location: ../admin/view.php");
             break;
         default:
             header("Location: default_dashboard.php");

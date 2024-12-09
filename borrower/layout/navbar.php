@@ -7,10 +7,10 @@
             <a class="nav-link" href="/borrower/view.php">Search Resources</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="transact.php">Borrowing and Overdue Fines</a>
+            <a class="nav-link" href="/borrower/fines/fine_history.php">My Overdue Fines</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="borrow_history.php">Borrow History</a>
+            <a class="nav-link" href="/borrower//borrow_history.php">My Borrow History</a>
         </li>
         <!-- User Name and Profile -->
         <li class="nav-item dropdown">

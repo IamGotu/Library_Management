@@ -10,30 +10,21 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['faculty'
 // Include the database connection
 include '../config/db.php';
 
-// Get the logged-in user's ID from the session
-$user_id = $_SESSION['user_id'];
-
-// Function to get the logged-in user's borrowing history
-function getUserHistory($user_id) {
+// Function to get borrowing history for the logged-in user
+function getUserBorrowingHistory($userId) {
     global $pdo;
-    $sql = "
-        SELECT 
-            lr.Title, 
-            bt.borrow_date, 
-            bt.due_date, 
-            bt.return_date,
-            bt.status
-        FROM borrow_transactions bt
-        JOIN libraryresources lr ON bt.resource_id = lr.ResourceID
-        WHERE bt.user_id = ?
-        ORDER BY bt.borrow_date DESC
-    ";
+    $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.ApproverID, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix, bt.borrow_date, bt.due_date, bt.return_date, bt.status
+            FROM borrow_transactions bt
+            JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
+            WHERE bt.BorrowerID = :userId
+            ORDER BY bt.borrow_date DESC";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id]);
+    $stmt->execute(['userId' => $userId]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$history = getUserHistory($user_id);
+// Get the borrowing history for the logged-in user
+$history = getUserBorrowingHistory($_SESSION['user_id']);
 ?>
 
 <!DOCTYPE html>
@@ -41,71 +32,65 @@ $history = getUserHistory($user_id);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Borrowing History</title>
-    <style>
-        table {
-            width: 90%;
-            margin: auto;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>Borrowing History</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/../components/css/view.css">
+    <link rel="icon" href="../components/image/book.png" type="image/x-icon">
 </head>
 <body>
-    <h1 style="text-align: center;">My Borrowing History</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Borrow Date</th>
-                <th>Due Date</th>
-                <th>Return Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($history)): ?>
-                <?php foreach ($history as $record): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($record['Title']); ?></td>
-                        <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
-                        <td><?php echo htmlspecialchars($record['due_date']); ?></td>
-                        <td><?php echo htmlspecialchars($record['return_date'] ?? 'Not Returned'); ?></td>
-                        <td>
-                            <?php
-                            switch ($record['status']) {
-                                case 'borrowed':
-                                    echo '<span style="color: blue;">Borrowed</span>';
-                                    break;
-                                case 'returned':
-                                    echo '<span style="color: green;">Returned</span>';
-                                    break;
-                                case 'overdue':
-                                    echo '<span style="color: red;">Overdue</span>';
-                                    break;
-                            }
-                            ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="5" style="text-align: center;">No borrowing history found.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="dashboard.php">Back to Dashboard</a>
+    <!-- Navbar -->
+    <?php include '../borrower/layout/navbar.php'; ?>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="centered-heading">
+                <h2>Borrowing History</h2>
+            </div>
+
+            <!-- Borrowing History Table -->
+            <div class="table-container">
+                <?php if (empty($history)): ?>
+                    <p class="text-center text-white">No borrowing history found for completed transactions.</p>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Accession Number</th>
+                                <th>Borrower ID</th>
+                                <th>Borrower Name</th>
+                                <th>Approver ID</th>
+                                <th>Approver Name</th>
+                                <th>Status</th>
+                                <th>Borrow Date</th>
+                                <th>Due Date</th>
+                                <th>Return Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($history as $record): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($record['Title']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['AccessionNumber']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['BorrowerID']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['Borrower_first_name'] . ' ' . $record['Borrower_middle_name'] . ' ' . $record['Borrower_last_name'] . ' ' . $record['Borrower_suffix']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['ApproverID']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['Approver_first_name'] . ' ' . $record['Approver_middle_name'] . ' ' . $record['Approver_last_name'] . ' ' . $record['Approver_suffix']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['status']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['due_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['return_date']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
+
+    <!-- Bootstrap Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

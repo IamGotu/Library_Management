@@ -20,7 +20,7 @@ if (isset($_POST['login'])) {
     if ($user) {
         if (password_verify($password, $user['password'])) {
             // User is authenticated, store user details in session
-            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_id'] = $user['membership_id'];
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix'];
             $_SESSION['user_type'] = $user['user_type'];
 
