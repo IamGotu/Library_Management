@@ -51,7 +51,7 @@ $stmt = $pdo->prepare("UPDATE libraryresources SET AvailabilityStatus = 'Availab
 $stmt->bindParam(':resourceID', $transaction['ResourceID'], PDO::PARAM_INT);
 $stmt->execute();
 
-// On successful return
+// On successful return, redirect to `borrowed_resources.php` with success
 header("Location: borrowed_resources.php?success=return_success");
 exit();
 ?>
