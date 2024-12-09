@@ -15,7 +15,7 @@ if (isset($_GET['fineID'])) {
     $fineID = $_GET['fineID'];
 
     // Fetch fine details including borrower and approver information
-    $fineQuery = $pdo->prepare("SELECT f.BorrowTransactionID, f.BorrowerID, f.Borrower_first_name, f.Borrower_middle_name, f.Borrower_last_name, f.Borrower_suffix, f.Amount, f.DateGenerated, f.PaidStatus, f.ApproverID, f.DatePaid, b.first_name AS BorrowerFirst, b.last_name AS BorrowerLast, a.first_name AS ApproverFirst, a.middle_name AS ApproverMiddle, a.last_name AS ApproverLast, a.suffix AS ApproverSuffix
+    $fineQuery = $pdo->prepare("SELECT f.BorrowTransactionID, f.BorrowerID, f.Borrower_first_name, f.Borrower_middle_name, f.Borrower_last_name, f.Borrower_suffix, f.Amount, f.DateGenerated, f.PaidStatus, f.ApproverID, f.DatePaid, f.ReceiptPrinted, b.first_name AS BorrowerFirst, b.last_name AS BorrowerLast, a.first_name AS ApproverFirst, a.middle_name AS ApproverMiddle, a.last_name AS ApproverLast, a.suffix AS ApproverSuffix
                                 FROM fines f
                                 LEFT JOIN users b ON f.BorrowerID = b.membership_id
                                 LEFT JOIN users a ON f.ApproverID = a.membership_id
@@ -42,7 +42,7 @@ if (isset($_GET['fineID'])) {
     <title>Receipt</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../components/css/print.css"> <!-- Link to your CSS file for print styling -->
-    <link rel="icon" href="../components/image/book.png" type="image/x-icon">
+    <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
     <div class="container">
@@ -77,6 +77,24 @@ if (isset($_GET['fineID'])) {
         // Automatically trigger print dialog on page load
         window.onload = function() {
             window.print();
+        };
+
+        // Event listener to handle the after print action
+        window.onafterprint = function() {
+            // AJAX request to update the ReceiptPrinted status
+            var fineID = <?php echo $fineID; ?>;  // Get the fineID from PHP
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "update_receipt_status.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    console.log("Receipt status updated successfully.");
+                } else {
+                    console.log("Error updating receipt status.");
+                }
+            };
+            xhr.send("fineID=" + fineID + "&receiptPrinted=yes");
         };
     </script>
 </body>

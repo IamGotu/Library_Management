@@ -10,8 +10,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
 // Include the database connection
 include '../../config/db.php';
 
-// Fetch all fines (whether paid or unpaid)
-$fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, Amount, DateGenerated, PaidStatus, ID FROM fines")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch unpaid fines with unprinted receipts
+$fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, Amount, DateGenerated, PaidStatus, ID
+                       FROM fines
+                       WHERE PaidStatus = 'unpaid' OR ReceiptPrinted = 'no'")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +24,7 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
     <title>Overdue Fines</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../components/css/view.css"> <!-- Link to your CSS file -->
-    <link rel="icon" href="../components/image/book.png" type="image/x-icon">
+    <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
     <!-- Navbar -->
@@ -51,32 +53,38 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
                     </thead>
                     <tbody>
                         <!-- PHP Code to Populate Table -->
-                        <?php foreach ($fines as $fine): ?>
+                        <?php if (count($fines) > 0): ?>
+                            <?php foreach ($fines as $fine): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($fine['BorrowTransactionID']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['BorrowerID']); ?></td>
+                                    <td>
+                                        <?php 
+                                            echo htmlspecialchars(
+                                                $fine['Borrower_first_name'] . ' ' . 
+                                                $fine['Borrower_middle_name'] . ' ' . 
+                                                $fine['Borrower_last_name'] . ' ' . 
+                                                $fine['Borrower_suffix']
+                                            ); 
+                                        ?>
+                                    </td>
+                                    <td> ₱<?php echo htmlspecialchars($fine['Amount']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['DateGenerated']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['PaidStatus']); ?></td>
+                                    <td>
+                                        <?php if ($fine['PaidStatus'] === 'unpaid'): ?>
+                                            <a href="pay_fine.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-primary">Pay</a>
+                                        <?php else: ?>
+                                            <a href="print_receipt.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-secondary">Print Receipt</a>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($fine['BorrowTransactionID']); ?></td>
-                                <td><?php echo htmlspecialchars($fine['BorrowerID']); ?></td>
-                                <td>
-                                    <?php 
-                                        echo htmlspecialchars(
-                                            $fine['Borrower_first_name'] . ' ' . 
-                                            $fine['Borrower_middle_name'] . ' ' . 
-                                            $fine['Borrower_last_name'] . ' ' . 
-                                            $fine['Borrower_suffix']
-                                        ); 
-                                    ?>
-                                </td>
-                                <td> ₱<?php echo htmlspecialchars($fine['Amount']); ?></td>
-                                <td><?php echo htmlspecialchars($fine['DateGenerated']); ?></td>
-                                <td><?php echo htmlspecialchars($fine['PaidStatus']); ?></td>
-                                <td>
-                                    <?php if ($fine['PaidStatus'] === 'unpaid'): ?>
-                                        <a href="pay_fine.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-primary">Pay</a>
-                                    <?php else: ?>
-                                        <a href="print_receipt.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-secondary">Print Receipt</a>
-                                    <?php endif; ?>
-                                </td>
+                                <td colspan="7" class="text-center">No overdue fine transactions found.</td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
