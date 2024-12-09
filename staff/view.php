@@ -195,7 +195,7 @@ $categories = getCategoriesByResourceType($resourceType);
                                     <?php endif; ?>
                                     <td>
                                         <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
-                                            <a href="./transactions/borrow.php?resourceID=<?php echo $resource['ResourceID']; ?>" class="btn btn-primary mt-3 w-100">Borrow</a>
+                                            <a href="./borrow_transactions/borrow.php?resourceID=<?php echo $resource['ResourceID']; ?>" class="btn btn-primary mt-3 w-100">Borrow</a>
                                         <?php else: ?>
                                             <span class="btn btn-secondary mt-3 w-100">Unavailable</span>
                                         <?php endif; ?>
