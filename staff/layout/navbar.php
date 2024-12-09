@@ -7,7 +7,10 @@
             <a class="nav-link" href="/staff/view.php">Search Resources</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="transact.php">Borrowing and Overdue Fines</a>
+            <a class="nav-link" href="/staff/transactions/borrowed_resources.php">Borrowed Resources</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/staff/transactions/fine.php">Overdue Fine</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="borrow_history.php">Borrow History</a>

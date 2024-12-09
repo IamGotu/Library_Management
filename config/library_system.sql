@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2024 at 07:27 PM
+-- Generation Time: Dec 09, 2024 at 11:15 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,8 +38,6 @@ CREATE TABLE `books` (
   `Edition` varchar(50) DEFAULT NULL,
   `PublicationDate` date DEFAULT NULL,
   `Genre` varchar(100) DEFAULT NULL,
-  `Quantity` int(11) DEFAULT 0,
-  `AvailableQuantity` int(11) DEFAULT 0,
   `Status` enum('available','unavailable','Available','Borrowed','Reserved') DEFAULT 'available'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -47,11 +45,11 @@ CREATE TABLE `books` (
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`BookID`, `Title`, `Author`, `ISBN`, `Publisher`, `Edition`, `PublicationDate`, `Genre`, `Quantity`, `AvailableQuantity`, `Status`) VALUES
-(78, '', 'Harper Lee', '978-0061120084', 'J.B. Lippincott & Co.', NULL, '1960-07-11', NULL, 0, 0, 'available'),
-(79, '', 'Patrick M. Fitzpatrick', '978-0534376034', 'Brooks Cole', NULL, '2002-01-01', NULL, 0, 0, 'available'),
-(80, '', 'American Psychological Association', '978-1433832176', 'APA Publishing', NULL, '2020-12-15', NULL, 0, 0, 'available'),
-(81, '', 'Yuval Noah Harari', '978-0062316097', 'Harper', NULL, '2015-02-10', NULL, 0, 0, 'available');
+INSERT INTO `books` (`BookID`, `Title`, `Author`, `ISBN`, `Publisher`, `Edition`, `PublicationDate`, `Genre`, `Status`) VALUES
+(78, '', 'Harper Lee', '978-0061120084', 'J.B. Lippincott & Co.', NULL, '1960-07-11', NULL, 'available'),
+(79, '', 'Patrick M. Fitzpatrick', '978-0534376034', 'Brooks Cole', NULL, '2002-01-01', NULL, 'available'),
+(80, '', 'American Psychological Association', '978-1433832176', 'APA Publishing', NULL, '2020-12-15', NULL, 'available'),
+(81, '', 'Yuval Noah Harari', '978-0062316097', 'Harper', NULL, '2015-02-10', NULL, 'available');
 
 -- --------------------------------------------------------
 
@@ -61,8 +59,16 @@ INSERT INTO `books` (`BookID`, `Title`, `Author`, `ISBN`, `Publisher`, `Edition`
 
 CREATE TABLE `borrow_transactions` (
   `ID` int(11) NOT NULL,
-  `BorrowerID` int(11) NOT NULL,
+  `BorrowerID` int(100) NOT NULL,
+  `Borrower_first_name` varchar(255) NOT NULL,
+  `Borrower_middle_name` varchar(255) DEFAULT NULL,
+  `Borrower_last_name` varchar(255) NOT NULL,
+  `Borrower_suffix` varchar(255) DEFAULT NULL,
   `ApproverID` int(11) NOT NULL,
+  `Approver_first_name` varchar(255) NOT NULL,
+  `Approver_middle_name` varchar(255) DEFAULT NULL,
+  `Approver_last_name` varchar(255) NOT NULL,
+  `Approver_suffix` varchar(255) DEFAULT NULL,
   `ResourceID` int(11) NOT NULL,
   `ResourceType` enum('Book','MediaResource','Periodical') NOT NULL,
   `AccessionNumber` varchar(50) NOT NULL,
@@ -71,6 +77,21 @@ CREATE TABLE `borrow_transactions` (
   `return_date` date DEFAULT NULL,
   `status` enum('borrowed','returned','overdue') DEFAULT 'borrowed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tracks borrowing transactions for library resources';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fines`
+--
+
+CREATE TABLE `fines` (
+  `ID` int(11) NOT NULL,
+  `BorrowerID` int(100) NOT NULL,
+  `BorrowTransactionID` int(11) NOT NULL,
+  `Amount` decimal(10,2) NOT NULL,
+  `DateGenerated` date NOT NULL DEFAULT curdate(),
+  `PaidStatus` enum('unpaid','paid') NOT NULL DEFAULT 'unpaid'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -216,6 +237,14 @@ ALTER TABLE `borrow_transactions`
   ADD KEY `accession_number` (`AccessionNumber`);
 
 --
+-- Indexes for table `fines`
+--
+ALTER TABLE `fines`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `BorrowID` (`BorrowerID`),
+  ADD KEY `BorrowTransactionID` (`BorrowTransactionID`);
+
+--
 -- Indexes for table `libraryresources`
 --
 ALTER TABLE `libraryresources`
@@ -259,7 +288,13 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `borrow_transactions`
 --
 ALTER TABLE `borrow_transactions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `fines`
+--
+ALTER TABLE `fines`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `libraryresources`
@@ -290,6 +325,13 @@ ALTER TABLE `users`
 --
 
 --
+-- Constraints for table `fines`
+--
+ALTER TABLE `fines`
+  ADD CONSTRAINT `borrower_ibfk_1` FOREIGN KEY (`BorrowerID`) REFERENCES `borrow_transactions` (`BorrowerID`),
+  ADD CONSTRAINT `fines_ibfk_1` FOREIGN KEY (`BorrowTransactionID`) REFERENCES `borrow_transactions` (`ID`);
+
+--
 -- Constraints for table `mediaresources`
 --
 ALTER TABLE `mediaresources`
@@ -305,3 +347,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+

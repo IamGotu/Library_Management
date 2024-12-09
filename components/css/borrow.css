@@ -1,0 +1,98 @@
+/* Body Styling */
+body {
+    background: url('../Image/pexels-element5-1370295.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Card Wrapper Styling */
+.container .card {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    padding: 20px;
+}
+
+/* Heading Styling */
+.card-header {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 8px 8px 0 0;
+}
+
+.card-header h3 {
+    color: #8bc34a; /* Highlighted green text */
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Shadow effect */
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(0, 0, 0, 0.6); /* Dark background for rows */
+    color: #eee;
+}
+
+table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #555;
+}
+
+table th {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #8bc34a;
+    text-transform: uppercase;
+}
+
+table tbody tr:hover {
+    background-color: rgba(139, 195, 74, 0.2); /* Highlight effect */
+}
+
+/* Form Styling */
+form {
+    padding: 20px;
+    border-radius: 8px;
+}
+
+form input, form select {
+    border: 1px solid #8bc34a; /* Green border */
+    border-radius: 5px;
+    padding: 10px;
+}
+
+form input:focus, form select:focus {
+    border-color: #7cb342;
+    box-shadow: 0 0 5px rgba(139, 195, 74, 0.7); /* Glow effect */
+}
+
+/* Button Styling */
+form label{
+    color: #8bc34a; /* Green theme */
+}
+
+/* Button Styling */
+form .btn-primary, form .btn-success {
+    background-color: #8bc34a; /* Green theme */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+form .btn-primary:hover, form .btn-success:hover {
+    background-color: #7cb342;
+    cursor: pointer;
+}
+
+/* Button Styling */
+form .btn-secondary {
+    color: #060804;
+    background-color: #fff; /* Green theme */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}

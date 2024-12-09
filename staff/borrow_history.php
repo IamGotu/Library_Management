@@ -10,27 +10,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
 // Include the database connection
 include '../config/db.php';
 
-if (!isset($_GET['user_id'])) {
-    echo "User ID not specified.";
-    exit();
-}
-
-$user_id = $_GET['user_id'];
-
-// Function to get a user's borrowing history
-function getUserHistory($user_id) {
+// Function to get all borrowing history (only completed transactions with a return date)
+function getAllBorrowingHistory() {
     global $pdo;
-    $sql = "SELECT lr.Title, bt.borrow_date, bt.return_date 
+    $sql = "SELECT lr.Title, bt.BorrowerID, bt.borrow_date, bt.return_date 
             FROM borrow_transactions bt
-            JOIN libraryresources lr ON bt.resource_id = lr.ResourceID
-            WHERE bt.user_id = ? AND bt.status = 'returned'
+            JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
+            WHERE bt.status = 'returned' AND bt.return_date IS NOT NULL
             ORDER BY bt.borrow_date DESC";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id]);
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$history = getUserHistory($user_id);
+$history = getAllBorrowingHistory();
 ?>
 
 <!DOCTYPE html>
@@ -39,27 +32,52 @@ $history = getUserHistory($user_id);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Borrowing History</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../components/css/view.css">
+    <link rel="icon" href="../components/image/book.png" type="image/x-icon">
 </head>
 <body>
-    <h1>Borrowing History for User ID: <?php echo htmlspecialchars($user_id); ?></h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Borrow Date</th>
-                <th>Return Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($history as $record): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($record['Title']); ?></td>
-                    <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
-                    <td><?php echo htmlspecialchars($record['return_date']); ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-    <a href="user_manage.php">Back to User Management</a>
+    <!-- Navbar -->
+    <?php include './layout/navbar.php'; ?>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="centered-heading">
+                <h2>Borrowing History</h2>
+            </div>
+
+            <!-- Borrowing History Table -->
+            <div class="table-container">
+                <?php if (empty($history)): ?>
+                    <p class="text-center text-white">No borrowing history found for completed transactions.</p>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Borrower ID</th>
+                                <th>Borrow Date</th>
+                                <th>Return Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($history as $record): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($record['Title']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['BorrowerID']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['return_date']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
