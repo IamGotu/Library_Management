@@ -44,7 +44,7 @@ try {
 
     // Fetch the current staff details
     $staff_id = $_SESSION['user_id'];
-    $stmt = $pdo->prepare("SELECT membership_id, first_name, middle_name, last_name, suffix FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT membership_id, first_name, middle_name, last_name, suffix FROM users WHERE membership_id = ?");
     $stmt->execute([$staff_id]);
     $staff = $stmt->fetch(PDO::FETCH_ASSOC);
 

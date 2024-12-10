@@ -16,7 +16,7 @@ function getAllBorrowingHistory() {
     $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.ApproverID, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix, bt.borrow_date, bt.due_date, bt.return_date, bt.status
             FROM borrow_transactions bt
             JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
-            WHERE bt.status = 'returned' OR bt.status = 'borrowed' OR 'overdue'
+            WHERE bt.status = 'returned' OR bt.status = 'borrowed' OR bt.status = 'overdue'
             ORDER BY bt.borrow_date DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();

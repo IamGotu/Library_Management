@@ -42,7 +42,7 @@ if ($resourceID) {
 }
 
 // Retrieve the current logged-in staff's membership_id from the database
-$stmt = $pdo->prepare("SELECT membership_id, first_name, middle_name, last_name, suffix FROM users WHERE id = :user_id AND user_type = 'staff'");
+$stmt = $pdo->prepare("SELECT membership_id, first_name, middle_name, last_name, suffix FROM users WHERE membership_id = :user_id AND user_type = 'staff'");
 $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $staff = $stmt->fetch(PDO::FETCH_ASSOC);
