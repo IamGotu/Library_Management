@@ -1,0 +1,114 @@
+/* Navigation Bar Container */
+.navbar {
+    width: 100%;
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    justify-content: space-between; /* Space between brand and navigation links */
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+}
+
+/* Navbar Brand */
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+/* Navigation Links Container */
+.nav {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem; /* Space between links */
+    margin: 0;
+    padding: 0;
+}
+
+/* Navigation Links */
+.nav-link {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 8px 15px; /* Add some padding for spacing */
+    border-radius: 5px; /* Rounded hover effect */
+}
+
+/* Hover and Active Styles */
+.nav-link:hover {
+    background-color: #8bc34a;
+    color: white;
+}
+
+.nav-link.active {
+    background-color: #8bc34a;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column; /* Stack links vertically on smaller screens */
+        gap: 0.5rem;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+        padding: 10px;
+    }
+}
+
+/* ------------------------------------------------------------------------------------------------*/
+
+/* Background and Layout */
+body {
+    background: url('../Image/library-background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding: 10px;
+}
+
+.container {
+    margin-top: 30px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 30px;
+    border-radius: 8px;
+}
+
+/* Heading and Form Styling */
+h3 {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+form .form-control {
+    border-radius: 5px;
+}
+
+/* Table Styling */
+.table-responsive {
+    margin-top: 30px;
+}
+
+.table th, .table td {
+    text-align: center;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Button Styling */
+.btn {
+    border-radius: 5px;
+}
+
+.btn-primary, .btn-success, .btn-warning, .btn-danger {
+    padding: 10px;
+}
