@@ -3,7 +3,7 @@ session_start();
 
 // Check if the user is logged in and is a staff member
     if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'admin') {
-        header("Location: ../login/login.php");
+        header("Location: ../../login/login.php");
         exit();
 }
 
@@ -11,30 +11,29 @@ session_start();
 include '../../config/db.php';
 
 if (isset($_GET['membership_id'])) {
-    $user_id = $_GET['membership_id'];
+    try {
+        $membership_id = $_GET['membership_id'];
+        $sql = "SELECT * FROM users WHERE membership_id = :membership_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':membership_id', $membership_id, PDO::PARAM_STR);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Fetch user details from the database
-    $sql = "SELECT * FROM users WHERE membership_id = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$user_id]);
-
-    // Fetch the user data
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Return user details as JSON if found, else return an error
-    if ($user) {
-        echo json_encode($user);
-    } else {
-        echo json_encode(['error' => 'User not found']);
+        if ($user) {
+            echo json_encode($user);
+        } else {
+            echo json_encode(['error' => 'User not found.']);
+        }
+    } catch (PDOException $e) {
+        echo json_encode(['error' => 'Database error: ' . htmlspecialchars($e->getMessage())]);
     }
-} else {
-    echo json_encode(['error' => 'No user ID provided']);
+    exit();
 }
 
 // Function to delete a user
 if (isset($_GET['delete_user'])) {
     $user_id = $_GET['delete_user'];
-    $sql = "DELETE FROM users WHERE id = ?";
+    $sql = "DELETE FROM users WHERE membership_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$user_id]);
     echo "User deleted successfully!";
@@ -192,28 +191,30 @@ $users = getUsers($searchTerm);
 
                                         <input type="text" name="last_name" class="form-control mb-3" placeholder="Last Name" required>
                                         <input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
+                                        <input type="text" name="purok" class="form-control mb-3" placeholder="Purok (Optional)">
                                         <input type="text" name="street" class="form-control mb-3" placeholder="Street (Optional)">
-                                        <input type="text" name="barangay" class="form-control mb-3" placeholder="Barangay" required>
-                                        <input type="text" name="city" class="form-control mb-3" placeholder="City" required>
+                                        <input type="date" name="date_of_birth" class="form-control mb-3" required>
                                     </div>
                                     <div class="col-md-6">
                                         <input type="text" name="middle_name" class="form-control mb-3" placeholder="Middle Name (Optional)">
                                         <input type="text" name="suffix" class="form-control mb-3" placeholder="Suffix (Optional)">
                                         <input type="text" name="phone_number" class="form-control mb-3" placeholder="Phone Number" required>
-                                        <input type="date" name="date_of_birth" class="form-control mb-3" required>
+                                        <input type="text" name="barangay" class="form-control mb-3" placeholder="Barangay" required>
+                                        <input type="text" name="city" class="form-control mb-3" placeholder="City" required>
                                         <select name="user_type" class="form-select mb-3" required>
                                             <option value="admin">Admin</option>
                                             <option value="staff">Staff</option>
                                             <option value="faculty">Faculty</option>
                                             <option value="student">Student</option>
                                         </select>
-                                        <button type="submit" name="add_user" class="btn btn-success w-100">Add User</button>
                                     </div>
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="add_user" class="btn btn-primary w-100">Add User</button>
+        
+                                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Close</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -232,40 +233,40 @@ $users = getUsers($searchTerm);
                             <form method="POST" action="user_manage.php">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
-                                        <input type="text" name="membership_id" class="form-control mb-3" value="<?php echo $user['membership_id']; ?>" placeholder="Membership ID" required>
                                         <input type="text" name="first_name" class="form-control mb-3" value="<?php echo $user['first_name']; ?>" placeholder="First Name" required>
                                         <input type="text" name="last_name" class="form-control mb-3" value="<?php echo $user['last_name']; ?>" placeholder="Last Name" required>
                                         <input type="email" name="email" class="form-control mb-3" value="<?php echo $user['email']; ?>" placeholder="Email" required>
                                         <input type="text" name="street" class="form-control mb-3" value="<?php echo $user['street']; ?>" placeholder="Street (Optional)">
-                                        <input type="text" name="barangay" class="form-control mb-3" value="<?php echo $user['barangay']; ?>" placeholder="Barangay" required>
-                                        <input type="text" name="city" class="form-control mb-3" value="<?php echo $user['city']; ?>" placeholder="City" required>
+                                        <input type="text" name="purok" class="form-control mb-3" value="<?php echo $user['purok']; ?>" placeholder="Purok (Optional)">
+                                        <input type="date" name="date_of_birth" class="form-control mb-3" value="<?php echo $user['date_of_birth']; ?>" required>
                                     </div>
                                     <div class="col-md-6">
                                         <input type="text" name="middle_name" class="form-control mb-3" value="<?php echo $user['middle_name']; ?>" placeholder="Middle Name (Optional)">
                                         <input type="text" name="suffix" class="form-control mb-3" value="<?php echo $user['suffix']; ?>" placeholder="Suffix (Optional)">
                                         <input type="text" name="phone_number" class="form-control mb-3" value="<?php echo $user['phone_number']; ?>" placeholder="Phone Number" required>
-                                        <input type="date" name="date_of_birth" class="form-control mb-3" value="<?php echo $user['date_of_birth']; ?>" required>
+                                        <input type="text" name="barangay" class="form-control mb-3" value="<?php echo $user['barangay']; ?>" placeholder="Barangay" required>
+                                        <input type="text" name="city" class="form-control mb-3" value="<?php echo $user['city']; ?>" placeholder="City" required>
                                         <select name="user_type" class="form-select" required>
                                             <option value="admin" <?php echo ($user['user_type'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
                                             <option value="staff" <?php echo ($user['user_type'] == 'staff') ? 'selected' : ''; ?>>Staff</option>
                                             <option value="faculty" <?php echo ($user['user_type'] == 'faculty') ? 'selected' : ''; ?>>Faculty</option>
                                             <option value="student" <?php echo ($user['user_type'] == 'student') ? 'selected' : ''; ?>>Student</option>
                                         </select>
-                                        <button type="submit" name="edit_user" class="btn btn-warning w-100 mt-3">Save Changes</button>
                                     </div>
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="edit_user" class="btn btn-primary w-100 mt-3">Save Changes</button>
+        
+                                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Close</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Users List Table -->
-            <div class="table-responsive">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -273,6 +274,8 @@ $users = getUsers($searchTerm);
                             <th>User Type</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Date of Birth</th>
                             <th>Address</th>
                             <th>Actions</th>
                         </tr>
@@ -284,10 +287,20 @@ $users = getUsers($searchTerm);
                                 <td><?php echo htmlspecialchars($user['user_type']); ?></td>
                                 <td><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix']); ?></td>
                                 <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                <td><?php echo htmlspecialchars($user['phone_number']); ?></td>
+                                <td><?php echo htmlspecialchars($user['date_of_birth']); ?></td>
                                 <td><?php echo htmlspecialchars($user['street'] . ' ' . $user['barangay'] . ' ' . $user['city']); ?></td>
+
                                 <td>
                                     <!-- Edit User Modal -->
-                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" data-id="<?php echo $user['membership_id']; ?>">Edit User</button>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-warning" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editModal" 
+                                        data-id="<?php echo htmlspecialchars($user['membership_id']); ?>">
+                                        Edit
+                                    </button>
 
                                     <a href="user_manage.php?delete_user=<?php echo $user['membership_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
                                 </td>
@@ -299,39 +312,37 @@ $users = getUsers($searchTerm);
         </div>
     </div>
     <script>
-        // When the edit button is clicked, fetch the user data and populate the modal
-        $('#editModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var userId = button.data('id'); // Extract the user ID from the data-id attribute
+        // Fetch user details when the edit button is clicked
+        document.addEventListener('DOMContentLoaded', () => {
+            const editModal = document.getElementById('editModal');
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const userId = button.getAttribute('data-id'); // Extract membership ID from data-* attribute
 
-            // Send an AJAX request to fetch the user details based on the userId
-            $.ajax({
-                url: 'fetch_user.php',  // This file will handle the database fetch
-                method: 'GET',
-                data: { user_id: userId },
-                success: function(response) {
-                    var user = JSON.parse(response);
+                // AJAX request to fetch user details
+                fetch(`user_manage.php?membership_id=${userId}`)
+                    .then(response => response.json())
+                    .then(user => {
+                        if (user.error) {
+                            alert(user.error);
+                            return;
+                        }
 
-                    if (user.error) {
-                        alert(user.error);
-                    } else {
-                        // Populate the modal fields with the user data
-                        $('input[name="first_name"]').val(user.first_name);
-                        $('input[name="last_name"]').val(user.last_name);
-                        $('input[name="email"]').val(user.email);
-                        $('input[name="street"]').val(user.street);
-                        $('input[name="barangay"]').val(user.barangay);
-                        $('input[name="city"]').val(user.city);
-                        $('input[name="middle_name"]').val(user.middle_name);
-                        $('input[name="suffix"]').val(user.suffix);
-                        $('input[name="phone_number"]').val(user.phone_number);
-                        $('input[name="date_of_birth"]').val(user.date_of_birth);
-                        $('select[name="user_type"]').val(user.user_type); // Select the user type option
-                    }
-                },
-                error: function() {
-                    alert('Error fetching user data');
-                }
+                        // Populate the modal fields with user data
+                        editModal.querySelector('input[name="first_name"]').value = user.first_name || '';
+                        editModal.querySelector('input[name="middle_name"]').value = user.middle_name || '';
+                        editModal.querySelector('input[name="last_name"]').value = user.last_name || '';
+                        editModal.querySelector('input[name="suffix"]').value = user.suffix || '';
+                        editModal.querySelector('input[name="email"]').value = user.email || '';
+                        editModal.querySelector('input[name="street"]').value = user.street || '';
+                        editModal.querySelector('input[name="purok"]').value = user.purok || '';
+                        editModal.querySelector('input[name="barangay"]').value = user.barangay || '';
+                        editModal.querySelector('input[name="city"]').value = user.city || '';
+                        editModal.querySelector('input[name="phone_number"]').value = user.phone_number || '';
+                        editModal.querySelector('input[name="date_of_birth"]').value = user.date_of_birth || '';
+                        editModal.querySelector('select[name="user_type"]').value = user.user_type || '';
+                    })
+                    .catch(error => console.error('Error fetching user details:', error));
             });
         });
     </script>

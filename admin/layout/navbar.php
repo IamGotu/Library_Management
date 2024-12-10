@@ -13,7 +13,7 @@
             <a class="nav-link" href="/admin/fine_history.php">Overdue Fines Logs</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="borrow_history.php">Borrow Logs</a>
+            <a class="nav-link" href="/admin/borrow_history.php">Borrow Logs</a>
         </li>
         <!-- User Name and Profile -->
         <li class="nav-item dropdown">

@@ -13,7 +13,7 @@ include '../config/db.php';
 // Fetch unpaid fines with unprinted receipts
 $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, ApproverID, Approver_first_name, Approver_middle_name, Approver_last_name, Approver_suffix, Amount, DatePaid, PaidStatus
                        FROM fines
-                       WHERE PaidStatus = 'unpaid' OR ReceiptPrinted = 'no'")->fetchAll(PDO::FETCH_ASSOC);
+                       WHERE PaidStatus = 'unpaid' OR PaidStatus = 'paid' OR ReceiptPrinted = 'no'")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
