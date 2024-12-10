@@ -121,7 +121,6 @@ if (isset($_POST['add_book'])) {
         $stmtBook->execute([$resourceID, $author, $isbn, $publisher, $publication_date]);
 
         $pdo->commit();
-        echo "Book added successfully with Accession Number: $accession_number";
     } catch (Exception $e) {
         $pdo->rollBack();
         echo "Error adding book: " . $e->getMessage();
@@ -134,7 +133,6 @@ if (isset($_GET['delete_book'])) {
     $sql = "DELETE FROM LibraryResources WHERE ResourceID = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$resourceID]);
-    echo "Book deleted successfully!";
 }
 
 // Function to update a book
@@ -161,7 +159,6 @@ if (isset($_POST['edit_book'])) {
         $stmtBook->execute([$author, $isbn, $publisher, $publication_date, $resourceID]);
 
         $pdo->commit();
-        echo "Book updated successfully!";
     } catch (Exception $e) {
         $pdo->rollBack();
         echo "Error updating book: " . $e->getMessage();

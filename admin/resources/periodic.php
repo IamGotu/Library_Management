@@ -13,29 +13,23 @@ include '../../config/db.php';
 // Function to generate a unique accession number for resources
 function generateAccessionNumber($resourceType) {
     global $pdo;
-    // Fetch the current year
     $year = date('Y');
     
-    // Get the last used accession number from the library resources
     $sql = "SELECT MAX(AccessionNumber) AS max_accession FROM LibraryResources WHERE AccessionNumber LIKE ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['P' . $year . '%']);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Extract the number and increment it
     $lastNumber = $result['max_accession'];
     $nextNumber = $lastNumber ? (intval(substr($lastNumber, -3)) + 1) : 1;
     
-    // Format the new accession number as "R-Year-XXXX" (e.g., "R-2023-0001")
     $newAccessionNumber = 'P' . '-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-    // Check if the generated accession number already exists
     $sqlCheck = "SELECT COUNT(*) FROM LibraryResources WHERE AccessionNumber = ?";
     $stmtCheck = $pdo->prepare($sqlCheck);
     $stmtCheck->execute([$newAccessionNumber]);
     $count = $stmtCheck->fetchColumn();
 
-    // If the number already exists, increment it until a unique number is found
     while ($count > 0) {
         $nextNumber++;
         $newAccessionNumber = 'P' . '-' . $year . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
@@ -43,11 +37,10 @@ function generateAccessionNumber($resourceType) {
         $count = $stmtCheck->fetchColumn();
     }
 
-    // Return the unique accession number
     return $newAccessionNumber;
 }
 
-// Function to get all periodicals
+// Get all periodicals
 function getPeriodicals($resourceID = null) {
     global $pdo;
     $sql = "
@@ -75,7 +68,7 @@ function getPeriodicals($resourceID = null) {
     return $resourceID ? $stmt->fetch(PDO::FETCH_ASSOC) : $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Function to add a new periodical
+// Add periodical
 if (isset($_POST['add_periodical'])) {
     $title = $_POST['title'];
     $issn = $_POST['issn'];
@@ -84,44 +77,41 @@ if (isset($_POST['add_periodical'])) {
     $publicationDate = $_POST['publicationDate'];
     $type = $_POST['type'];
 
-    // Generate accession number
     $accession_number = generateAccessionNumber('Periodical');
 
     try {
         $pdo->beginTransaction();
 
-        // Insert into LibraryResources
         $sqlLibrary = "INSERT INTO LibraryResources (Title, ResourceType, Category, AccessionNumber) 
                        VALUES (?, 'Periodical', ?, ?)";
         $stmtLibrary = $pdo->prepare($sqlLibrary);
         $stmtLibrary->execute([$title, $type, $accession_number]);
 
-        $resourceID = $pdo->lastInsertId(); // Get the ResourceID of the inserted periodical
+        $resourceID = $pdo->lastInsertId();
 
-        // Insert into Periodicals
         $sqlPeriodical = "INSERT INTO Periodicals (ResourceID, ISSN, Volume, Issue, PublicationDate) 
                           VALUES (?, ?, ?, ?, ?)";
         $stmtPeriodical = $pdo->prepare($sqlPeriodical);
         $stmtPeriodical->execute([$resourceID, $issn, $volume, $issue, $publicationDate]);
 
         $pdo->commit();
-        echo "Periodical added successfully with Accession Number: $accession_number";
+        $_SESSION['message'] = "Periodical added successfully with Accession Number: $accession_number";
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo "Error adding periodical: " . $e->getMessage();
+        $_SESSION['error'] = "Error adding periodical: " . $e->getMessage();
     }
 }
 
-// Function to delete a periodical
+// Delete periodical
 if (isset($_GET['delete_periodical'])) {
     $resourceID = $_GET['delete_periodical'];
     $sql = "DELETE FROM LibraryResources WHERE ResourceID = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$resourceID]);
-    echo "Periodical deleted successfully!";
+    $_SESSION['message'] = "Periodical deleted successfully!";
 }
 
-// Function to update a periodical
+// Update periodical
 if (isset($_POST['edit_periodical'])) {
     $resourceID = $_POST['resourceID'];
     $title = $_POST['title'];
@@ -134,21 +124,19 @@ if (isset($_POST['edit_periodical'])) {
     try {
         $pdo->beginTransaction();
 
-        // Update LibraryResources
         $sqlLibrary = "UPDATE LibraryResources SET Title = ?, Category = ? WHERE ResourceID = ?";
         $stmtLibrary = $pdo->prepare($sqlLibrary);
         $stmtLibrary->execute([$title, $type, $resourceID]);
 
-        // Ensure data is being passed correctly for the update in Periodicals
         $sqlPeriodical = "UPDATE Periodicals SET ISSN = ?, Volume = ?, Issue = ?, PublicationDate = ? WHERE ResourceID = ?";
         $stmtPeriodical = $pdo->prepare($sqlPeriodical);
         $stmtPeriodical->execute([$issn, $volume, $issue, $publicationDate, $resourceID]);
 
         $pdo->commit();
-        echo "Periodical updated successfully!";
+        $_SESSION['message'] = "Periodical updated successfully!";
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo "Error updating periodical: " . $e->getMessage();
+        $_SESSION['error'] = "Error updating periodical: " . $e->getMessage();
     }
 }
 
@@ -162,15 +150,13 @@ $periodicals = getPeriodicals();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Periodical Management</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../components/css/resources.css"> <!-- Custom styles -->
+    <link rel="stylesheet" href="../../components/css/resources.css">
     <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
 
-<!-- Container -->
 <div class="container">
-
-    <!-- Add New Periodical Form -->
+    <!-- Add Periodical Form -->
     <h3 class="text-center">Add Periodical</h3>
     <form method="POST" action="periodic.php" class="mb-5">
         <input type="text" name="title" placeholder="Title" required>
@@ -253,5 +239,15 @@ $periodicals = getPeriodicals();
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Trigger modal with success or error message based on PHP flag
+    <?php if (isset($message)): ?>
+        var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        document.getElementById('modalBody').innerHTML = '<?php echo addslashes($message); ?>';
+        messageModal.show();
+    <?php endif; ?>
+</script>
+
 </body>
 </html>

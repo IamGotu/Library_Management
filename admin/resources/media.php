@@ -104,7 +104,6 @@ if (isset($_POST['add_media'])) {
         $stmtMedia->execute([$resourceID, $format, $runtime, $media_type]);
 
         $pdo->commit();
-        echo "Media Resource added successfully with Accession Number: $accession_number";
     } catch (Exception $e) {
         $pdo->rollBack();
         echo "Error adding media resource: " . $e->getMessage();
@@ -117,7 +116,6 @@ if (isset($_GET['delete_media'])) {
     $sql = "DELETE FROM LibraryResources WHERE ResourceID = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$resourceID]);
-    echo "Media resource deleted successfully!";
 }
 
 // Function to update a media resource
@@ -150,7 +148,6 @@ if (isset($_POST['edit_media'])) {
         $stmtMedia->execute([$format, $runtime, $media_type, $resourceID]);
 
         $pdo->commit();
-        echo "Media resource updated successfully!";
     } catch (Exception $e) {
         $pdo->rollBack();
         echo "Error updating media resource: " . $e->getMessage();
