@@ -1,14 +1,15 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is a staff member
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
+// Check if the user is logged in and is either a faculty or a student
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin'])) {
     header("Location: ../login/login.php");
     exit();
 }
 
+
 // Include the database connection
-include '../config/db.php';
+include '../../config/db.php';
 
 // Function to get all books
 function getBooks() {
@@ -25,7 +26,7 @@ function getBooks() {
             LR.AccessionNumber
         FROM LibraryResources LR
         LEFT JOIN Books B ON LR.ResourceID = B.BookID
-        WHERE LR.ResourceType = 'Book';  // Only fetch books
+        WHERE LR.ResourceType = 'Book';
     ";
     $stmt = $pdo->query($sql);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -45,7 +46,7 @@ function getBook($resourceID) {
             B.PublicationDate   
         FROM LibraryResources LR
         LEFT JOIN Books B ON LR.ResourceID = B.BookID
-        WHERE LR.ResourceID = ?  // Fetch only based on ResourceID (BookID)
+        WHERE LR.ResourceID = ?
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$resourceID]);
@@ -176,21 +177,18 @@ $books = getBooks();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Management</title>
-    <link rel="stylesheet" href="/style/style.css"> <!-- Add your CSS file -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../components/css/resources.css"> <!-- Custom styles -->
+    <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
-
-<!-- Navbar -->
-<div class="navbar">
-    <h2>Library Book Management</h2>
-</div>
 
 <!-- Container -->
 <div class="container">
 
     <!-- Add New Book Form -->
-    <h3>Add Book</h3>
-    <form method="POST" action="book.php">
+    <h3 class="text-center">Add Book</h3>
+    <form method="POST" action="book.php" class="mb-5">
         <input type="text" name="title" placeholder="Title" required>
         <input type="text" name="author" placeholder="Author" required>
         <input type="text" name="isbn" placeholder="ISBN" required>
@@ -202,14 +200,14 @@ $books = getBooks();
             <option value="Academic">Academic</option>
             <option value="Reference">Reference</option>
         </select>
-        <button type="submit" name="add_book">Add Book</button>
+        <button type="submit" class="rounded mt-3 w-100" name="add_book">Add Book</button>
     </form>
 
-    <!-- Edit Book Form (Only appears if editing) -->
+    <!-- Edit Book Form -->
     <?php if (isset($_GET['edit_book'])): 
         $book = getBook($_GET['edit_book']);
     ?>
-        <h3>Edit Book</h3>
+        <h3 class="text-center">Edit Book</h3>
         <form method="POST" action="book.php">
             <input type="hidden" name="resourceID" value="<?php echo $book['ResourceID']; ?>">
             <input type="text" name="title" value="<?php echo htmlspecialchars($book['Title']); ?>" required>
@@ -223,44 +221,49 @@ $books = getBooks();
                 <option value="Academic" <?php echo ($book['Genre'] == 'Academic') ? 'selected' : ''; ?>>Academic</option>
                 <option value="Reference" <?php echo ($book['Genre'] == 'Reference') ? 'selected' : ''; ?>>Reference</option>
             </select>
-            <button type="submit" name="edit_book">Update Book</button>
+            <button type="submit" class="rounded mt-3 w-100" name="edit_book">Update Book</button>
         </form>
     <?php endif; ?>
 
     <!-- Book List -->
-    <h3>Book List</h3>
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>ISBN</th>
-            <th>Publisher</th>
-            <th>Genre</th>
-            <th>Publication Date</th>
-            <th>Accession Number</th>
-            <th>Actions</th>
-        </tr>
-        <?php foreach ($books as $book): ?>
+    <h3 class="text-center">Book List</h3>
+    <table class="table table-hover">
+        <thead>
             <tr>
-                <td><?php echo htmlspecialchars($book['Title']); ?></td>
-                <td><?php echo htmlspecialchars($book['Author']); ?></td>
-                <td><?php echo htmlspecialchars($book['ISBN']); ?></td>
-                <td><?php echo htmlspecialchars($book['Publisher']); ?></td>
-                <td><?php echo htmlspecialchars($book['Genre']); ?></td>
-                <td><?php echo htmlspecialchars($book['PublicationDate']); ?></td>
-                <td><?php echo htmlspecialchars($book['AccessionNumber']); ?></td>
-                <td>
-                    <a href="book.php?edit_book=<?php echo $book['ResourceID']; ?>">Edit</a>
-                    <a href="book.php?delete_book=<?php echo $book['ResourceID']; ?>">Delete</a>
-                </td>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Publisher</th>
+                <th>Genre</th>
+                <th>Publication Date</th>
+                <th>Accession Number</th>
+                <th>Actions</th>
             </tr>
-        <?php endforeach; ?>
+        </thead>
+        <tbody>
+            <?php foreach ($books as $book): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($book['Title']); ?></td>
+                    <td><?php echo htmlspecialchars($book['Author']); ?></td>
+                    <td><?php echo htmlspecialchars($book['ISBN']); ?></td>
+                    <td><?php echo htmlspecialchars($book['Publisher']); ?></td>
+                    <td><?php echo htmlspecialchars($book['Genre']); ?></td>
+                    <td><?php echo htmlspecialchars($book['PublicationDate']); ?></td>
+                    <td><?php echo htmlspecialchars($book['AccessionNumber']); ?></td>
+                    <td>
+                        <a href="book.php?edit_book=<?php echo $book['ResourceID']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="book.php?delete_book=<?php echo $book['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
 
     <!-- Go Back Button -->
-    <a href="dashboard.php" class="go-back-btn">Go Back to Dashboard</a>
+    <a href="../view.php" class="text-center go-back-btn mt-3 w-100">Go Back to Dashboard</a>
 
-</div> <!-- End Container -->
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

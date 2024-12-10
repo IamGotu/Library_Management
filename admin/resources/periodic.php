@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is a staff member
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
+// Check if the user is logged in and is either a faculty or a student
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin'])) {
     header("Location: ../login/login.php");
     exit();
 }
 
 // Include the database connection
-include '../config/db.php';
+include '../../config/db.php';
 
 // Function to generate a unique accession number for resources
 function generateAccessionNumber($resourceType) {
@@ -48,7 +48,7 @@ function generateAccessionNumber($resourceType) {
 }
 
 // Function to get all periodicals
-function getPeriodicals() {
+function getPeriodicals($resourceID = null) {
     global $pdo;
     $sql = "
         SELECT 
@@ -62,10 +62,17 @@ function getPeriodicals() {
             LR.AccessionNumber
         FROM LibraryResources LR
         LEFT JOIN Periodicals P ON LR.ResourceID = P.ResourceID
-        WHERE LR.ResourceType = 'Periodical';
+        WHERE LR.ResourceType = 'Periodical'
     ";
-    $stmt = $pdo->query($sql);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($resourceID) {
+        $sql .= " AND LR.ResourceID = :resourceID";
+    }
+    $stmt = $pdo->prepare($sql);
+    if ($resourceID) {
+        $stmt->bindParam(':resourceID', $resourceID, PDO::PARAM_INT);
+    }
+    $stmt->execute();
+    return $resourceID ? $stmt->fetch(PDO::FETCH_ASSOC) : $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Function to add a new periodical
@@ -74,7 +81,7 @@ if (isset($_POST['add_periodical'])) {
     $issn = $_POST['issn'];
     $volume = $_POST['volume'];
     $issue = $_POST['issue'];
-    $publicatonDate = $_POST['publicatonDate'];
+    $publicationDate = $_POST['publicationDate'];
     $type = $_POST['type'];
 
     // Generate accession number
@@ -95,7 +102,7 @@ if (isset($_POST['add_periodical'])) {
         $sqlPeriodical = "INSERT INTO Periodicals (ResourceID, ISSN, Volume, Issue, PublicationDate) 
                           VALUES (?, ?, ?, ?, ?)";
         $stmtPeriodical = $pdo->prepare($sqlPeriodical);
-        $stmtPeriodical->execute([$resourceID, $issn, $volume, $issue, $publicatonDate]);
+        $stmtPeriodical->execute([$resourceID, $issn, $volume, $issue, $publicationDate]);
 
         $pdo->commit();
         echo "Periodical added successfully with Accession Number: $accession_number";
@@ -121,7 +128,7 @@ if (isset($_POST['edit_periodical'])) {
     $issn = $_POST['issn'];
     $volume = $_POST['volume'];
     $issue = $_POST['issue'];
-    $publicatonDate = $_POST['publicatonDate'];
+    $publicationDate = $_POST['publicationDate'];
     $type = $_POST['type'];
 
     try {
@@ -132,10 +139,10 @@ if (isset($_POST['edit_periodical'])) {
         $stmtLibrary = $pdo->prepare($sqlLibrary);
         $stmtLibrary->execute([$title, $type, $resourceID]);
 
-        // Update Periodicals
+        // Ensure data is being passed correctly for the update in Periodicals
         $sqlPeriodical = "UPDATE Periodicals SET ISSN = ?, Volume = ?, Issue = ?, PublicationDate = ? WHERE ResourceID = ?";
         $stmtPeriodical = $pdo->prepare($sqlPeriodical);
-        $stmtPeriodical->execute([$issn, $volume, $issue, $resourceID]);
+        $stmtPeriodical->execute([$issn, $volume, $issue, $publicationDate, $resourceID]);
 
         $pdo->commit();
         echo "Periodical updated successfully!";
@@ -154,26 +161,23 @@ $periodicals = getPeriodicals();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Periodical Management</title>
-    <link rel="stylesheet" href="/style/style.css"> <!-- Add your CSS file -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../components/css/resources.css"> <!-- Custom styles -->
+    <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
-
-<!-- Navbar -->
-<div class="navbar">
-    <h2>Library Periodical Management</h2>
-</div>
 
 <!-- Container -->
 <div class="container">
 
     <!-- Add New Periodical Form -->
-    <h3>Add Periodical</h3>
-    <form method="POST" action="periodic.php">
+    <h3 class="text-center">Add Periodical</h3>
+    <form method="POST" action="periodic.php" class="mb-5">
         <input type="text" name="title" placeholder="Title" required>
         <input type="text" name="issn" placeholder="ISSN" required>
         <input type="text" name="volume" placeholder="Volume" required>
         <input type="text" name="issue" placeholder="Issue">
-        <input type="date" name="publicatonDate" placeholder="Publication Date">
+        <input type="date" name="publicationDate" placeholder="Publication Date">
         <select name="type" required>
             <option value="Newspaper">Newspaper</option>
             <option value="Newsletter">Newsletter</option>
@@ -182,20 +186,21 @@ $periodicals = getPeriodicals();
             <option value="Bulletin">Bulletin</option>
             <option value="Annual">Annual</option>
         </select>
-        <button type="submit" name="add_periodical">Add Periodical</button>
+        <button type="submit" class="rounded mt-3 w-100" name="add_periodical">Add Periodical</button>
     </form>
 
-    <!-- Edit Periodical Form (Only appears if editing) -->
+    <!-- Edit Periodical Form -->
     <?php if (isset($_GET['edit_periodical'])): 
         $periodical = getPeriodicals($_GET['edit_periodical']);
     ?>
-        <h3>Edit Periodical</h3>
+        <h3 class="text-center">Edit Periodical</h3>
         <form method="POST" action="periodic.php">
             <input type="hidden" name="resourceID" value="<?php echo $periodical['ResourceID']; ?>">
             <input type="text" name="title" value="<?php echo htmlspecialchars($periodical['Title']); ?>" required>
             <input type="text" name="issn" value="<?php echo htmlspecialchars($periodical['ISSN']); ?>" required>
             <input type="text" name="volume" value="<?php echo htmlspecialchars($periodical['Volume']); ?>" required>
             <input type="text" name="issue" value="<?php echo htmlspecialchars($periodical['Issue']); ?>">
+            <input type="date" name="publicationDate" value="<?php echo htmlspecialchars($periodical['PublicationDate']); ?>">
             <select name="type" required>
                 <option value="Newspaper" <?php echo ($periodical['Type'] == 'Newspaper') ? 'selected' : ''; ?>>Newspaper</option>
                 <option value="Newsletter" <?php echo ($periodical['Type'] == 'Newsletter') ? 'selected' : ''; ?>>Newsletter</option>
@@ -204,45 +209,49 @@ $periodicals = getPeriodicals();
                 <option value="Bulletin" <?php echo ($periodical['Type'] == 'Bulletin') ? 'selected' : ''; ?>>Bulletin</option>
                 <option value="Annual" <?php echo ($periodical['Type'] == 'Annual') ? 'selected' : ''; ?>>Annual</option>
             </select>
-            <button type="submit" name="edit_periodical">Update Periodical</button>
+            <button type="submit" class="rounded mt-3 w-100" name="edit_periodical">Update Periodical</button>
         </form>
     <?php endif; ?>
 
     <!-- Periodical List -->
-    <h3>Periodical List</h3>
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>ISSN</th>
-            <th>Volume</th>
-            <th>Issue</th>
-            <th>Publication Date</th>
-            <th>Type</th>
-            <th>Accession Number</th>
-            <th>Actions</th>
-        </tr>
-        <?php foreach ($periodicals as $periodical): ?>
+    <h3 class="text-center">Periodical List</h3>
+    <table class="table table-hover">
+        <thead>
             <tr>
-                <td><?php echo htmlspecialchars($periodical['Title']); ?></td>
-                <td><?php echo htmlspecialchars($periodical['ISSN']); ?></td>
-                <td><?php echo htmlspecialchars($periodical['Volume']); ?></td>
-                <td><?php echo htmlspecialchars($periodical['Issue']); ?></td>
-                <td><?php echo htmlspecialchars($periodical['PublicationDate']); ?></td>
-                <td><?php echo htmlspecialchars($periodical['Type']); ?></td>
-                <td><?php echo htmlspecialchars($periodical['AccessionNumber']); ?></td>
-                <td>
-                    <a href="periodic.php?edit_periodical=<?php echo $periodical['ResourceID']; ?>">Edit</a>
-                    <a href="periodic.php?delete_periodical=<?php echo $periodical['ResourceID']; ?>">Delete</a>
-                </td>
+                <th>Title</th>
+                <th>ISSN</th>
+                <th>Volume</th>
+                <th>Issue</th>
+                <th>Publication Date</th>
+                <th>Type</th>
+                <th>Accession Number</th>
+                <th>Actions</th>
             </tr>
-        <?php endforeach; ?>
+        </thead>
+        <tbody>
+            <?php foreach ($periodicals as $periodical): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($periodical['Title']); ?></td>
+                    <td><?php echo htmlspecialchars($periodical['ISSN']); ?></td>
+                    <td><?php echo htmlspecialchars($periodical['Volume']); ?></td>
+                    <td><?php echo htmlspecialchars($periodical['Issue']); ?></td>
+                    <td><?php echo htmlspecialchars($periodical['PublicationDate']); ?></td>
+                    <td><?php echo htmlspecialchars($periodical['Type']); ?></td>
+                    <td><?php echo htmlspecialchars($periodical['AccessionNumber']); ?></td>
+                    <td>
+                        <a href="periodic.php?edit_periodical=<?php echo $periodical['ResourceID']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="periodic.php?delete_periodical=<?php echo $periodical['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
 
     <!-- Go Back Button -->
-    <a href="dashboard.php" class="go-back-btn">Go Back to Dashboard</a>
+    <a href="../view.php" class="text-center go-back-btn mt-3 w-100">Go Back to Dashboard</a>
 
-</div> <!-- End Container -->
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-            

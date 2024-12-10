@@ -1,17 +1,17 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is a staff member
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
-    header("Location: ../../login/login.php");
+// Check if the user is logged in and is either a faculty or a student
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin'])) {
+    header("Location: ../login/login.php");
     exit();
 }
 
 // Include the database connection
-include '../../config/db.php';
+include '../config/db.php';
 
 // Fetch unpaid fines with unprinted receipts
-$fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, Amount, DateGenerated, PaidStatus, ID
+$fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, ApproverID, Approver_first_name, Approver_middle_name, Approver_last_name, Approver_suffix, Amount, DatePaid, PaidStatus
                        FROM fines
                        WHERE PaidStatus = 'unpaid' OR ReceiptPrinted = 'no'")->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -28,7 +28,7 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
 </head>
 <body>
     <!-- Navbar -->
-    <?php include '../layout/navbar.php'; ?>
+    <?php include '../admin/layout/navbar.php'; ?>
 
     <!-- Main Content -->
     <div class="content-wrapper">
@@ -42,13 +42,13 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
                 <table>
                     <thead>
                         <tr>
-                            <th>Transaction ID</th>
                             <th>Borrower ID</th>
                             <th>Borrower Name</th>
+                            <th>Approver ID</th>
+                            <th>Approver Name</th>
                             <th>Amount</th>
-                            <th>Payment Generated Date</th>
+                            <th>Date Paid</th>
                             <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,7 +56,6 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
                         <?php if (count($fines) > 0): ?>
                             <?php foreach ($fines as $fine): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($fine['BorrowTransactionID']); ?></td>
                                     <td><?php echo htmlspecialchars($fine['BorrowerID']); ?></td>
                                     <td>
                                         <?php 
@@ -68,16 +67,20 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
                                             ); 
                                         ?>
                                     </td>
-                                    <td> ₱<?php echo htmlspecialchars($fine['Amount']); ?></td>
-                                    <td><?php echo htmlspecialchars($fine['DateGenerated']); ?></td>
-                                    <td><?php echo htmlspecialchars($fine['PaidStatus']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['ApproverID']); ?></td>
                                     <td>
-                                        <?php if ($fine['PaidStatus'] === 'unpaid'): ?>
-                                            <a href="pay_fine.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-primary">Pay</a>
-                                        <?php else: ?>
-                                            <a href="print_receipt.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-secondary">Print Receipt</a>
-                                        <?php endif; ?>
+                                        <?php 
+                                            echo htmlspecialchars(
+                                                $fine['Approver_first_name'] . ' ' . 
+                                                $fine['Approver_middle_name'] . ' ' . 
+                                                $fine['Approver_last_name'] . ' ' . 
+                                                $fine['Approver_suffix']
+                                            ); 
+                                        ?>
                                     </td>
+                                    <td> ₱<?php echo htmlspecialchars($fine['Amount']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['DatePaid']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['PaidStatus']); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>

@@ -1,0 +1,85 @@
+/* Body Styling */
+body {
+    background: url('../Image/pexels-element5-1370295.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Container Styling */
+.container {
+margin-top: 50px;
+background-color: rgba(255, 255, 255, 0.9);
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Form Styling */
+form input, form select, form button {
+margin-bottom: 15px;
+}
+
+form input, form select {
+width: 100%;
+padding: 10px;
+border: 1px solid #8bc34a;
+border-radius: 5px;
+}
+
+form input:focus, form select:focus {
+outline: none;
+border-color: #7cb342;
+box-shadow: 0 0 5px rgba(139, 195, 74, 0.7);
+}
+
+form button {
+background-color: #8bc34a;
+color: #fff;
+border: none;
+padding: 10px 20px;
+text-transform: uppercase;
+font-weight: bold;
+transition: background-color 0.3s ease;
+}
+
+form button:hover {
+background-color: #7cb342;
+}
+
+/* Table Styling */
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 20px;
+}
+
+table th, table td {
+padding: 12px;
+text-align: left;
+border-bottom: 1px solid #ccc;
+}
+
+table th {
+background-color: #8bc34a;
+color: #fff;
+text-transform: uppercase;
+}
+
+table tbody tr:hover {
+background-color: rgba(139, 195, 74, 0.2);
+}
+
+/* Back Button */
+.go-back-btn {
+display: inline-block;
+margin-top: 20px;
+background-color: #8bc34a;
+color: #fff;
+padding: 10px 20px;
+border-radius: 5px;
+text-decoration: none;
+transition: background-color 0.3s ease;
+}
+
+.go-back-btn:hover {
+background-color: #7cb342;
+}

@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is a staff member
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
+// Check if the user is logged in and is either a faculty or a student
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin'])) {
     header("Location: ../login/login.php");
     exit();
 }
@@ -13,10 +13,10 @@ include '../config/db.php';
 // Function to get all borrowing history (only completed transactions with a return date)
 function getAllBorrowingHistory() {
     global $pdo;
-    $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.ApproverID, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix, bt.borrow_date, bt.return_date, bt.status
+    $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.ApproverID, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix, bt.borrow_date, bt.due_date, bt.return_date, bt.status
             FROM borrow_transactions bt
             JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
-            WHERE bt.status = 'returned' AND bt.return_date IS NOT NULL
+            WHERE bt.status = 'returned' OR bt.status = 'borrowed' OR 'overdue'
             ORDER BY bt.borrow_date DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -63,6 +63,7 @@ $history = getAllBorrowingHistory();
                                 <th>Approver Name</th>
                                 <th>Status</th>
                                 <th>Borrow Date</th>
+                                <th>Due Date</th>
                                 <th>Return Date</th>
                             </tr>
                         </thead>
@@ -77,6 +78,7 @@ $history = getAllBorrowingHistory();
                                     <td><?php echo htmlspecialchars($record['Approver_first_name'] . ' ' . $record['Approver_middle_name'] . ' ' . $record['Approver_last_name'] . ' ' . $record['Approver_suffix']); ?></td>
                                     <td><?php echo htmlspecialchars($record['status']); ?></td>
                                     <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($record['due_date']); ?></td>
                                     <td><?php echo htmlspecialchars($record['return_date']); ?></td>
                                 </tr>
                             <?php endforeach; ?>
