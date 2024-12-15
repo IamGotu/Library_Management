@@ -11,20 +11,54 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['faculty'
 include '../config/db.php';
 
 // Function to get borrowing history for the logged-in user
-function getUserBorrowingHistory($userId) {
+function getUserBorrowingHistory($searchTerm = '', $status = '', $userId) {
     global $pdo;
     $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.ApproverID, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix, bt.borrow_date, bt.due_date, bt.return_date, bt.status
             FROM borrow_transactions bt
             JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
-            WHERE bt.BorrowerID = :userId
-            ORDER BY bt.borrow_date DESC";
+            WHERE bt.BorrowerID = :userId";
+
+    // Add search condition if a search term is provided
+    if ($searchTerm) {
+        $sql .= " AND (lr.Title LIKE :searchTerm 
+                        OR bt.AccessionNumber LIKE :searchTerm
+                        OR bt.ApproverID LIKE :searchTerm
+                        OR CONCAT(bt.Approver_first_name, ' ', bt.Approver_middle_name, ' ', bt.Approver_last_name, ' ', bt.Approver_suffix) LIKE :searchTerm)";
+    }
+
+    // Add status filter if a status is selected
+    if ($status) {
+        $sql .= " AND bt.status = :status";
+    }
+
+    // Order by borrow date descending
+    $sql .= " ORDER BY bt.borrow_date DESC";
+
+    // Prepare the statement
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['userId' => $userId]);
+
+    // Bind the parameters
+    $stmt->bindValue(':userId', $userId);
+    if ($searchTerm) {
+        $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%');
+    }
+    if ($status) {
+        $stmt->bindValue(':status', $status);
+    }
+
+    // Execute the statement
+    $stmt->execute();
+
+    // Return the result
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Get the search term and status from the URL
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
+$status = isset($_GET['status']) ? $_GET['status'] : '';
+
 // Get the borrowing history for the logged-in user
-$history = getUserBorrowingHistory($_SESSION['user_id']);
+$history = getUserBorrowingHistory($searchTerm, $status, $_SESSION['user_id']);
 ?>
 
 <!DOCTYPE html>
@@ -47,6 +81,29 @@ $history = getUserBorrowingHistory($_SESSION['user_id']);
             <div class="centered-heading">
                 <h2>Borrowing History</h2>
             </div>
+
+            <!-- Search and Filter Form -->
+            <form method="GET" action="borrow_history.php" class="mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search:</label>
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Accession Number | Title | Approver ID | Approver Name"
+                            value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Filter by Status:</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            <option value="borrowed" <?php echo (isset($_GET['status']) && $_GET['status'] == 'borrowed') ? 'selected' : ''; ?>>Borrowed</option>
+                            <option value="returned" <?php echo (isset($_GET['status']) && $_GET['status'] == 'returned') ? 'selected' : ''; ?>>Returned</option>
+                            <option value="overdue" <?php echo (isset($_GET['status']) && $_GET['status'] == 'overdue') ? 'selected' : ''; ?>>Overdue</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
 
             <!-- Borrowing History Table -->
             <div class="table-container">

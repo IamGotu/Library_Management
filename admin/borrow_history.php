@@ -10,9 +10,11 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin'])
 // Include the database connection
 include '../config/db.php';
 
-// Function to get borrowing history for all users
-function getAllBorrowingHistory() {
+// Function to get borrowing history for all users with search and status filter
+function getAllBorrowingHistory($searchTerm = '', $status = '') {
     global $pdo;
+    
+    // Base SQL query
     $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, 
                    bt.Borrower_first_name, bt.Borrower_middle_name, 
                    bt.Borrower_last_name, bt.Borrower_suffix, 
@@ -22,14 +24,46 @@ function getAllBorrowingHistory() {
                    bt.return_date, bt.status
             FROM borrow_transactions bt
             JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
-            ORDER BY bt.borrow_date DESC";
+            WHERE 1";
+
+    // Add search condition if a search term is provided
+    if ($searchTerm) {
+        $sql .= " AND (lr.Title LIKE :searchTerm 
+                      OR bt.AccessionNumber LIKE :searchTerm
+                      OR bt.BorrowerID LIKE :searchTerm
+                      OR CONCAT(bt.Borrower_first_name, ' ', bt.Borrower_last_name) LIKE :searchTerm
+                      OR CONCAT(bt.Approver_first_name, ' ', bt.Approver_last_name) LIKE :searchTerm)";
+    }
+
+    // Add status filter if a status is selected
+    if ($status) {
+        $sql .= " AND bt.status = :status";
+    }
+
+    // Order by borrow date descending
+    $sql .= " ORDER BY bt.borrow_date DESC";
+
+    // Prepare and execute the statement
     $stmt = $pdo->prepare($sql);
+    
+    // Bind parameters if necessary
+    if ($searchTerm) {
+        $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%');
+    }
+    if ($status) {
+        $stmt->bindValue(':status', $status);
+    }
+
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Get the borrowing history for all users
-$history = getAllBorrowingHistory();
+// Get the search term and status from the URL
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
+$status = isset($_GET['status']) ? $_GET['status'] : '';
+
+// Get the borrowing history with filters
+$history = getAllBorrowingHistory($searchTerm, $status);
 ?>
 
 <!DOCTYPE html>
@@ -52,6 +86,29 @@ $history = getAllBorrowingHistory();
             <div class="centered-heading">
                 <h2>Borrowing History</h2>
             </div>
+
+            <!-- Search and Filter Form -->
+            <form method="GET" action="borrow_history.php" class="mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search:</label>
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Accession Number | Title | Borrower ID | Borrower Name"
+                            value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Filter by Status:</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            <option value="borrowed" <?php echo (isset($_GET['status']) && $_GET['status'] == 'borrowed') ? 'selected' : ''; ?>>Borrowed</option>
+                            <option value="returned" <?php echo (isset($_GET['status']) && $_GET['status'] == 'returned') ? 'selected' : ''; ?>>Returned</option>
+                            <option value="overdue" <?php echo (isset($_GET['status']) && $_GET['status'] == 'overdue') ? 'selected' : ''; ?>>Overdue</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
 
             <!-- Borrowing History Table -->
             <div class="table-container">
