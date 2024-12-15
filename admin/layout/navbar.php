@@ -10,13 +10,13 @@
             <a class="nav-link" href="/admin/users/user_manage.php">User Management</a>
         </li>   
         <li class="nav-item">
-            <a class="nav-link" href="/admin/fines_transactions/fine.php">Overdue Fines Logs</a>
+            <a class="nav-link" href="/admin/fines_transactions/fine.php">Overdue Fines</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/admin/borrow_transactions/borrowed_resources.php">Borrowed Resources</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/admin/borrow_history.php">Borrow Logs</a>
+            <a class="nav-link" href="/admin/borrow_history.php">Borrow History</a>
         </li>
         <!-- User Name and Profile -->
         <li class="nav-item dropdown">
