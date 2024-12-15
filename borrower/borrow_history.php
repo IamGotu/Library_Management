@@ -50,41 +50,43 @@ $history = getUserBorrowingHistory($_SESSION['user_id']);
 
             <!-- Borrowing History Table -->
             <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Accession Number</th>
+                            <th>Borrower ID</th>
+                            <th>Borrower Name</th>
+                            <th>Approver ID</th>
+                            <th>Approver Name</th>
+                            <th>Status</th>
+                            <th>Borrow Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($history as $record): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($record['Title']); ?></td>
+                                <td><?php echo htmlspecialchars($record['AccessionNumber']); ?></td>
+                                <td><?php echo htmlspecialchars($record['BorrowerID']); ?></td>
+                                <td><?php echo htmlspecialchars($record['Borrower_first_name'] . ' ' . $record['Borrower_middle_name'] . ' ' . $record['Borrower_last_name'] . ' ' . $record['Borrower_suffix']); ?></td>
+                                <td><?php echo htmlspecialchars($record['ApproverID']); ?></td>
+                                <td><?php echo htmlspecialchars($record['Approver_first_name'] . ' ' . $record['Approver_middle_name'] . ' ' . $record['Approver_last_name'] . ' ' . $record['Approver_suffix']); ?></td>
+                                <td><?php echo htmlspecialchars($record['status']); ?></td>
+                                <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
+                                <td><?php echo htmlspecialchars($record['due_date']); ?></td>
+                                <td><?php echo htmlspecialchars($record['return_date']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                
                 <?php if (empty($history)): ?>
                     <p class="text-center text-white">No borrowing history found for completed transactions.</p>
                 <?php else: ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Accession Number</th>
-                                <th>Borrower ID</th>
-                                <th>Borrower Name</th>
-                                <th>Approver ID</th>
-                                <th>Approver Name</th>
-                                <th>Status</th>
-                                <th>Borrow Date</th>
-                                <th>Due Date</th>
-                                <th>Return Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($history as $record): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($record['Title']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['AccessionNumber']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['BorrowerID']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['Borrower_first_name'] . ' ' . $record['Borrower_middle_name'] . ' ' . $record['Borrower_last_name'] . ' ' . $record['Borrower_suffix']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['ApproverID']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['Approver_first_name'] . ' ' . $record['Approver_middle_name'] . ' ' . $record['Approver_last_name'] . ' ' . $record['Approver_suffix']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['status']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['borrow_date']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['due_date']); ?></td>
-                                    <td><?php echo htmlspecialchars($record['return_date']); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+
                 <?php endif; ?>
             </div>
         </div>
