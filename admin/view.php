@@ -169,15 +169,15 @@ $categories = getCategoriesByResourceType($resourceType);
                             <p style="color: black;">What would you like to add?</p>
                             <div class="d-flex justify-content-around">
                                 <!-- Add Book Button -->
-                                <a href="/admin/resources/book.php" class="btn btn-success mt-3 w-100">Book</a>
+                                <a href="/admin/resources/book.php" class="btn btn-secondary w-100">Book</a>
                                 <!-- Add Media Button -->
-                                <a href="/admin/resources/media.php" class="btn btn-info mt-3 w-100 ">Media</a>
+                                <a href="/admin/resources/media.php" class="btn btn-secondary w-100">Media</a>
                                 <!-- Add Periodical Button -->
-                                <a href="/admin/resources/periodic.php" class="btn btn-warning mt-3 w-100">Periodical</a>
+                                <a href="/admin/resources/periodic.php" class="btn btn-secondary w-100">Periodical</a>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
