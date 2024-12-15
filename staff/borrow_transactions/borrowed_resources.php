@@ -10,19 +10,51 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'staff') {
 // Include the database connection
 include '../../config/db.php';
 
-// Function to get all active borrow transactions
-function getActiveBorrowTransactions() {
+// Initialize search and filter parameters
+$resourceType = isset($_GET['resource_type']) ? $_GET['resource_type'] : '';
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
+
+// Function to get filtered active borrow transactions
+function getActiveBorrowTransactions($resourceType, $searchTerm) {
     global $pdo;
-    $sql = "SELECT bt.ID, lr.Title, bt.borrow_date, bt.due_date, bt.BorrowerID, bt.ApproverID, bt.AccessionNumber, bt.ResourceType, bt.status, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix
+    $sql = "SELECT bt.ID, lr.Title, bt.borrow_date, bt.due_date, bt.BorrowerID, bt.ApproverID, bt.AccessionNumber, bt.ResourceType, bt.status,
+                   bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix,
+                   bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix
             FROM borrow_transactions bt
             JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
-            WHERE bt.status = 'borrowed'
-            ORDER BY bt.borrow_date DESC";
-    $stmt = $pdo->query($sql);
+            WHERE bt.status = 'borrowed'";
+
+    // Add ResourceType filter
+    if (!empty($resourceType)) {
+        $sql .= " AND bt.ResourceType = :resourceType";
+    }
+
+    // Add search filter for Title, AccessionNumber, BorrowerID, or Borrower name
+    if (!empty($searchTerm)) {
+        $sql .= " AND (lr.Title LIKE :searchTerm 
+                    OR bt.AccessionNumber LIKE :searchTerm 
+                    OR bt.BorrowerID LIKE :searchTerm 
+                    OR CONCAT(bt.Borrower_first_name, ' ', bt.Borrower_middle_name, ' ', bt.Borrower_last_name) LIKE :searchTerm)";
+    }
+
+    $sql .= " ORDER BY bt.borrow_date DESC";
+
+    $stmt = $pdo->prepare($sql);
+
+    // Bind parameters
+    if (!empty($resourceType)) {
+        $stmt->bindParam(':resourceType', $resourceType);
+    }
+    if (!empty($searchTerm)) {
+        $searchParam = "%$searchTerm%";
+        $stmt->bindParam(':searchTerm', $searchParam);
+    }
+
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$transactions = getActiveBorrowTransactions();
+$transactions = getActiveBorrowTransactions($resourceType, $searchTerm);
 ?>
 
 <!DOCTYPE html>
@@ -44,10 +76,32 @@ $transactions = getActiveBorrowTransactions();
         <div class="container">
 
             <!-- Header -->
-            <div class="centered-heading">
+            <div class="centered-heading mb-4">
                 <h2>Borrowed Resources</h2>
             </div>
 
+            <!-- Search and Filter Form -->
+            <form method="GET" action="borrowed_resources.php" class="mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="resource_type" class="form-label">Resource Type:</label>
+                        <select name="resource_type" id="resource_type" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="Book" <?php echo ($resourceType == 'Book') ? 'selected' : ''; ?>>Book</option>
+                            <option value="MediaResource" <?php echo ($resourceType == 'MediaResource') ? 'selected' : ''; ?>>Media Resource</option>
+                            <option value="Periodical" <?php echo ($resourceType == 'Periodical') ? 'selected' : ''; ?>>Periodical</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search:</label>
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Accession Number | Title | Borrower ID | Borrower Name" value="<?php echo htmlspecialchars($searchTerm); ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
+            
             <!-- Table Container -->
             <div class="table-container">
                 <table>
