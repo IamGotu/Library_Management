@@ -13,22 +13,25 @@ include '../../config/db.php';
 // Fetch the logged-in user's ID from the session
 $membership_id = $_SESSION['user_id'];
 
-// Fetch unpaid fines with unprinted receipts for the logged-in user
-$fines = $pdo->prepare("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, Amount, DateGenerated, PaidStatus, ID
-                       FROM fines
-                       WHERE BorrowerID = :membership_id");
-$fines->execute(['membership_id' => $membership_id]);
-$fines = $fines->fetchAll(PDO::FETCH_ASSOC);
-
-// Filter functionality
+// Search and filter functionality
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
 $paidStatus = isset($_GET['paid_status']) ? $_GET['paid_status'] : '';
 
-// Query to fetch fines with optional search and filter
-function getFilteredFines($paidStatus) {
+// Query to fetch fines with optional search and filter, and ensure it’s only for the logged-in user
+function getFilteredFines($searchTerm, $paidStatus, $membership_id) {
     global $pdo;
 
-    $sql = "SELECT * FROM fines WHERE 1=1";
-    $params = [];
+    $sql = "SELECT fines.*, borrow_transactions.AccessionNumber 
+            FROM fines 
+            INNER JOIN borrow_transactions ON fines.BorrowTransactionID = borrow_transactions.ID
+            WHERE fines.BorrowerID = :membership_id";
+    $params = [':membership_id' => $membership_id];
+
+        // Add search condition for BorrowerID or borrower names
+        if ($searchTerm) {
+            $sql .= " AND (borrow_transactions.AccessionNumber  LIKE :search)";
+            $params[':search'] = "%$searchTerm%";
+        }    
 
     // Add filter condition for PaidStatus
     if ($paidStatus) {
@@ -41,8 +44,8 @@ function getFilteredFines($paidStatus) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Fetch filtered fines
-$fines = getFilteredFines($paidStatus);
+// Fetch filtered fines for the logged-in user
+$fines = getFilteredFines($searchTerm, $paidStatus, $membership_id);
 ?>
 
 <!DOCTYPE html>
@@ -66,9 +69,17 @@ $fines = getFilteredFines($paidStatus);
                 <h2>Overdue Fines</h2>
             </div>
 
-            <!-- Filter Form -->
+            <!-- Search and Filter Form -->
             <form method="GET" action="fine_history.php">
-                <div class="row g-3 justify-content-center">
+                <div class="row g-3">
+                    <!-- Search Bar -->
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search Accession Number:</label>
+                        <input type="text" name="search" id="search" class="form-control" 
+                            placeholder="Accession Number" 
+                            value="<?php echo htmlspecialchars($searchTerm); ?>">
+                    </div>
+
                     <!-- Paid Status Filter -->
                     <div class="col-md-4">
                         <label for="paid_status" class="form-label">Filter by Status:</label>
@@ -92,6 +103,7 @@ $fines = getFilteredFines($paidStatus);
                     <thead>
                         <tr>
                             <th>Transaction ID</th>
+                            <th>Accession Number</th>
                             <th>Borrower ID</th>
                             <th>Borrower Name</th>
                             <th>Amount</th>
@@ -106,6 +118,7 @@ $fines = getFilteredFines($paidStatus);
                             <?php foreach ($fines as $fine): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($fine['BorrowTransactionID']); ?></td>
+                                    <td><?php echo htmlspecialchars($fine['AccessionNumber']); ?></td>
                                     <td><?php echo htmlspecialchars($fine['BorrowerID']); ?></td>
                                     <td>
                                         <?php 
