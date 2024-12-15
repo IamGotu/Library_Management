@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 include '../../config/db.php';
 
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT * FROM users WHERE id = ?";
+$sql = "SELECT * FROM users WHERE membership_id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (password_verify($current_password, $user['password'])) {
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
-            $update_sql = "UPDATE users SET password = ? WHERE id = ?";
+            $update_sql = "UPDATE users SET password = ? WHERE membership_id = ?";
             $update_stmt = $pdo->prepare($update_sql);
             if ($update_stmt->execute([$hashed_password, $user_id])) {
                 // Optionally reset the session or perform a re-login
