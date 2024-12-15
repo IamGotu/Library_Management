@@ -231,6 +231,24 @@ form {
     cursor: pointer; /* Pointer cursor */
 }
 
+/* Submit Button */
+.btn-warning, .btn-danger {
+    background-color: #c34a4a; /* Green background */
+    color: #fff; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Spacing */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Standard font size */
+    font-weight: bold; /* Emphasized text */
+    text-transform: uppercase; /* Uppercase for buttons */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.btn-warning:hover, .btn-danger:hover {
+    background-color: #c34a4a; /* Slightly darker on hover */
+    cursor: pointer; /* Pointer cursor */
+}
+
 /* Feedback Messages */
 .error-message {
     color: #ff6b6b;

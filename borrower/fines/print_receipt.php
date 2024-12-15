@@ -75,11 +75,15 @@ if (isset($_GET['fineID'])) {
         <div class="receipt border p-4">
             <h3 class="text-center">Library Fine Payment Receipt</h2>
             <p><strong>Transaction ID:</strong> <?php echo htmlspecialchars($fine['BorrowTransactionID']); ?></p>
+
+            <br>
             
             <p><strong>Borrower Information:</strong></p>
             <p>Name: <?php echo htmlspecialchars($fine['Borrower_first_name'] . ' ' . $fine['Borrower_middle_name'] . ' ' . $fine['Borrower_last_name'] . ' ' . $fine['Borrower_suffix']); ?></p>
             <p>Borrower ID: <?php echo htmlspecialchars($fine['BorrowerID']); ?></p>
 
+            <br>
+            
             <p><strong>Resource Information:</strong></p>
             <p>Title: <?php echo htmlspecialchars($fine['Title']); ?></p>
             <p>Accession Number: <?php echo htmlspecialchars($fine['AccessionNumber']); ?></p>
@@ -89,6 +93,8 @@ if (isset($_GET['fineID'])) {
             <p>Name: <?php echo htmlspecialchars($fine['ApproverFirst'] . ' ' . $fine['ApproverMiddle'] . ' ' . $fine['ApproverLast'] . ' ' . $fine['ApproverSuffix']); ?></p>
             <p>Approver ID: <?php echo htmlspecialchars($fine['ApproverID']); ?></p>
 
+            <br>
+            
             <p><strong>Amount:</strong> ₱<?php echo number_format($fine['Amount'], 2); ?></p>
             <p><strong>Date Generated:</strong> <?php echo htmlspecialchars($fine['DateGenerated']); ?></p>
             <p><strong>Date Paid:</strong> <?php echo $fine['DatePaid'] ? htmlspecialchars($fine['DatePaid']) : 'Not Paid Yet'; ?></p>

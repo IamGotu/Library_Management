@@ -122,7 +122,10 @@ $fines = getFilteredFines($paidStatus);
                                     <td><?php echo htmlspecialchars($fine['PaidStatus']); ?></td>
                                     <td>
                                         <?php if ($fine['PaidStatus'] === 'unpaid'): ?>
-                                            <a href="" class="btn btn-primary" disable>Unpaid</a>
+                                            <!-- Unpaid fine: Print Balance and Pay options -->
+                                            <a href="print_balance.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-warning">
+                                                Print Balance
+                                            </a>
                                         <?php else: ?>
                                             <a href="print_receipt.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-secondary">Print Receipt</a>
                                         <?php endif; ?>
