@@ -10,19 +10,25 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_type'], ['admin'])
 // Include the database connection
 include '../config/db.php';
 
-// Function to get all borrowing history (only completed transactions with a return date)
+// Function to get borrowing history for all users
 function getAllBorrowingHistory() {
     global $pdo;
-    $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, bt.Borrower_first_name, bt.Borrower_middle_name, bt.Borrower_last_name, bt.Borrower_suffix, bt.ApproverID, bt.Approver_first_name, bt.Approver_middle_name, bt.Approver_last_name, bt.Approver_suffix, bt.borrow_date, bt.due_date, bt.return_date, bt.status
+    $sql = "SELECT lr.Title, bt.AccessionNumber, bt.BorrowerID, 
+                   bt.Borrower_first_name, bt.Borrower_middle_name, 
+                   bt.Borrower_last_name, bt.Borrower_suffix, 
+                   bt.ApproverID, bt.Approver_first_name, 
+                   bt.Approver_middle_name, bt.Approver_last_name, 
+                   bt.Approver_suffix, bt.borrow_date, bt.due_date, 
+                   bt.return_date, bt.status
             FROM borrow_transactions bt
             JOIN libraryresources lr ON bt.ResourceID = lr.ResourceID
-            WHERE bt.status = 'returned' OR bt.status = 'borrowed' OR bt.status = 'overdue'
             ORDER BY bt.borrow_date DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Get the borrowing history for all users
 $history = getAllBorrowingHistory();
 ?>
 
@@ -33,12 +39,12 @@ $history = getAllBorrowingHistory();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Borrowing History</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../components/css/view.css">
+    <link rel="stylesheet" href="/../components/css/view.css">
     <link rel="icon" href="../components/image/book.png" type="image/x-icon">
 </head>
 <body>
     <!-- Navbar -->
-    <?php include './layout/navbar.php'; ?>
+    <?php include '../admin/layout/navbar.php'; ?>
 
     <!-- Main Content -->
     <div class="content-wrapper">

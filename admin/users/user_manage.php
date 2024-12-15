@@ -295,12 +295,14 @@ $users = getUsers($searchTerm);
                                     <!-- Edit User Modal -->
                                     <button 
                                         type="button" 
-                                        class="btn btn-warning" 
+                                        class="btn btn-secondary" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#editModal" 
                                         data-id="<?php echo htmlspecialchars($user['membership_id']); ?>">
                                         Edit
                                     </button>
+
+                                    <br> <br>
 
                                     <a href="user_manage.php?delete_user=<?php echo $user['membership_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
                                 </td>
