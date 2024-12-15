@@ -19,6 +19,30 @@ $fines = $pdo->prepare("SELECT BorrowTransactionID, BorrowerID, Borrower_first_n
                        WHERE BorrowerID = :membership_id");
 $fines->execute(['membership_id' => $membership_id]);
 $fines = $fines->fetchAll(PDO::FETCH_ASSOC);
+
+// Filter functionality
+$paidStatus = isset($_GET['paid_status']) ? $_GET['paid_status'] : '';
+
+// Query to fetch fines with optional search and filter
+function getFilteredFines($paidStatus) {
+    global $pdo;
+
+    $sql = "SELECT * FROM fines WHERE 1=1";
+    $params = [];
+
+    // Add filter condition for PaidStatus
+    if ($paidStatus) {
+        $sql .= " AND PaidStatus = :paidStatus";
+        $params[':paidStatus'] = $paidStatus;
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch filtered fines
+$fines = getFilteredFines($paidStatus);
 ?>
 
 <!DOCTYPE html>
@@ -41,6 +65,26 @@ $fines = $fines->fetchAll(PDO::FETCH_ASSOC);
             <div class="centered-heading">
                 <h2>Overdue Fines</h2>
             </div>
+
+            <!-- Filter Form -->
+            <form method="GET" action="fine_history.php">
+                <div class="row g-3 justify-content-center">
+                    <!-- Paid Status Filter -->
+                    <div class="col-md-4">
+                        <label for="paid_status" class="form-label">Filter by Status:</label>
+                        <select name="paid_status" id="paid_status" class="form-select">
+                            <option value="">All</option>
+                            <option value="paid" <?php echo ($paidStatus == 'paid') ? 'selected' : ''; ?>>Paid</option>
+                            <option value="unpaid" <?php echo ($paidStatus == 'unpaid') ? 'selected' : ''; ?>>Unpaid</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
             
             <!-- Table Section -->
             <div class="table-container">
