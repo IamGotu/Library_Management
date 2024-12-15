@@ -13,6 +13,9 @@
             <a class="nav-link" href="/admin/fines_transactions/fine.php">Overdue Fines Logs</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="/admin/borrow_transactions/borrowed_resources.php">Borrowed Resources</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="/admin/borrow_history.php">Borrow Logs</a>
         </li>
         <!-- User Name and Profile -->
