@@ -37,7 +37,7 @@ try {
 
     // Update the borrow transaction to set the return date
     $returnDate = date('Y-m-d'); // Set the current date as return date
-    $stmt = $pdo->prepare("UPDATE borrow_transactions SET return_date = :returnDate, status = 'returned' WHERE ID = :transactionID");
+    $stmt = $pdo->prepare("UPDATE borrow_transactions, libraryresources SET return_date = :returnDate, status = 'returned', AvailabilityStatus = 'Available'  WHERE ID = :transactionID");
     $stmt->bindParam(':returnDate', $returnDate);
     $stmt->bindParam(':transactionID', $transactionID, PDO::PARAM_INT);
     $stmt->execute();

@@ -73,9 +73,18 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
                                     <td><?php echo htmlspecialchars($fine['PaidStatus']); ?></td>
                                     <td>
                                         <?php if ($fine['PaidStatus'] === 'unpaid'): ?>
-                                            <a href="pay_fine.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-primary">Pay</a>
+                                            <!-- Unpaid fine: Print Balance and Pay options -->
+                                            <a href="print_balance.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-warning">
+                                                Print Balance
+                                            </a>
+                                            <a href="pay_fine.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-primary">
+                                                Pay
+                                            </a>
                                         <?php else: ?>
-                                            <a href="print_receipt.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-secondary">Print Receipt</a>
+                                            <!-- Paid fine: Only Print Receipt -->
+                                            <a href="print_receipt.php?fineID=<?php echo $fine['ID']; ?>" class="btn btn-secondary">
+                                                Print Receipt
+                                            </a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
