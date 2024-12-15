@@ -115,8 +115,8 @@ if (isset($_POST['add_book'])) {
         $resourceID = $pdo->lastInsertId(); // Get the ResourceID of the inserted book
 
         // Insert into Books (with PublicationDate)
-        $sqlBook = "INSERT INTO Books (BookID, Author, ISBN, Publisher, PublicationDate) 
-                    VALUES (?, ?, ?, ?, ?)";
+        $sqlBook = "INSERT INTO Books (BookID, Title, Author, ISBN, Genre, Publisher, PublicationDate) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmtBook = $pdo->prepare($sqlBook);
         $stmtBook->execute([$resourceID, $author, $isbn, $publisher, $publication_date]);
 
