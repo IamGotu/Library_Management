@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 15, 2024 at 06:59 PM
+-- Generation Time: Dec 15, 2024 at 07:04 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -123,7 +123,7 @@ CREATE TABLE `libraryresources` (
 
 INSERT INTO `libraryresources` (`ResourceID`, `Title`, `AccessionNumber`, `Category`, `ResourceType`, `AvailabilityStatus`) VALUES
 (78, 'To Kill a Mockingbird', 'B-2024-001', 'Fiction', 'Book', 'Available'),
-(79, 'Advanced Calculus', 'B-2024-002', 'Academic', 'Book', 'Checked Out'),
+(79, 'Advanced Calculus', 'B-2024-002', 'Academic', 'Book', 'Available'),
 (80, 'APA Handbook of Psychology', 'B-2024-003', 'Reference', 'Book', 'Available'),
 (81, 'Sapiens: A Brief History of Humankind', 'B-2024-004', 'Non-Fiction', 'Book', 'Available'),
 (102, 'Harry Potter and the Sorcerer\'s Stone', 'R-2024-001', 'AudioBook', 'MediaResource', 'Available'),
