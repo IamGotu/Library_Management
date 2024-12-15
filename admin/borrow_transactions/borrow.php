@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is a staff member
+// Check if the user is logged in and is a admin member
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'admin') {
     header("Location: ../../login/login.php");
     exit();
@@ -41,21 +41,21 @@ if ($resourceID) {
     exit();
 }
 
-// Retrieve the current logged-in staff's membership_id from the database
-$stmt = $pdo->prepare("SELECT membership_id, first_name, middle_name, last_name, suffix FROM users WHERE membership_id = :user_id AND user_type = 'staff'");
+// Retrieve the current logged-in admin's membership_id from the database
+$stmt = $pdo->prepare("SELECT membership_id, first_name, middle_name, last_name, suffix FROM users WHERE membership_id = :user_id AND user_type = 'admin'");
 $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
-$staff = $stmt->fetch(PDO::FETCH_ASSOC);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Check if staff record is found
-if (!$staff) {
-    $errorMessages[] = "Staff record not found. Please check the login session.";
+// Check if admin record is found
+if (!$admin) {
+    $errorMessages[] = "admin record not found. Please check the login session.";
 } else {
-    $approverID = $staff['membership_id']; // This is the staff's membership_id
-    $approverFirstName = $staff['first_name'];
-    $approverMiddleName = $staff['middle_name'];
-    $approverLastName = $staff['last_name'];
-    $approverSuffix = $staff['suffix'];
+    $approverID = $admin['membership_id']; // This is the admin's membership_id
+    $approverFirstName = $admin['first_name'];
+    $approverMiddleName = $admin['middle_name'];
+    $approverLastName = $admin['last_name'];
+    $approverSuffix = $admin['suffix'];
 }
 
 // Handle the borrow process

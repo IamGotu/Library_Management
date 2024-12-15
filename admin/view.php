@@ -48,7 +48,7 @@ function searchLibraryResources($resourceType, $searchTerm = '', $filterCategory
         } elseif ($resourceType == 'MediaResource') {
             $sql .= " AND (LR.Title LIKE :searchTerm OR MR.MediaType LIKE :searchTerm OR MR.Format LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
         } elseif ($resourceType == 'Periodical') {
-            $sql .= " AND (LR.Title LIKE :searchTerm OR P.Publisher LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
+            $sql .= " AND (LR.Title LIKE :searchTerm OR P.Volume LIKE :searchTerm OR LR.AccessionNumber LIKE :searchTerm)";
         }
     }
 
@@ -136,7 +136,7 @@ $categories = getCategoriesByResourceType($resourceType);
                     </div>
                     <div class="col-md-4">
                         <label for="search" class="form-label">Search:</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Enter keyword" value="<?php echo htmlspecialchars($searchTerm); ?>">
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Accession Number | Title | Author | Media Type" value="<?php echo htmlspecialchars($searchTerm); ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="category" class="form-label">Category:</label>
@@ -151,37 +151,7 @@ $categories = getCategoriesByResourceType($resourceType);
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>
-                <!-- Add Button -->
-                <button type="button" class="btn btn-primary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#addModal">
-                    Add Resources
-                </button>
             </form>
-
-            <!-- Add Resources Modal -->
-            <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addModalLabel" style="color: black;">Add New Resource</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p style="color: black;">What would you like to add?</p>
-                            <div class="d-flex justify-content-around">
-                                <!-- Add Book Button -->
-                                <a href="/admin/resources/book.php" class="btn btn-success mt-3 w-100">Book</a>
-                                <!-- Add Media Button -->
-                                <a href="/admin/resources/media.php" class="btn btn-info mt-3 w-100 ">Media</a>
-                                <!-- Add Periodical Button -->
-                                <a href="/admin/resources/periodic.php" class="btn btn-warning mt-3 w-100">Periodical</a>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Search Results Table -->
             <div class="table-container">
@@ -202,6 +172,7 @@ $categories = getCategoriesByResourceType($resourceType);
                                 <th>Volume</th>
                                 <th>Publication Date</th>
                             <?php endif; ?>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,6 +193,13 @@ $categories = getCategoriesByResourceType($resourceType);
                                         <td><?php echo htmlspecialchars($resource['AuthorOrType'] ?? 'N/A'); ?></td>
                                         <td><?php echo htmlspecialchars($resource['ExtraInfo'] ?? 'N/A'); ?></td>
                                     <?php endif; ?>
+                                    <td>
+                                        <?php if ($resource['AvailabilityStatus'] == 'Available'): ?>
+                                            <a href="./borrow_transactions/borrow.php?resourceID=<?php echo $resource['ResourceID']; ?>" class="btn btn-primary mt-3 w-100">Borrow</a>
+                                        <?php else: ?>
+                                            <span class="btn btn-secondary mt-3 w-100">Unavailable</span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -229,9 +207,10 @@ $categories = getCategoriesByResourceType($resourceType);
                         <?php endif; ?>
                     </tbody>
                 </table>
-            </div>
+            </div>            
         </div>
     </div>
+    <!-- Bootstrap Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
