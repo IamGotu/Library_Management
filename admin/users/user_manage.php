@@ -30,6 +30,38 @@ if (isset($_GET['membership_id'])) {
     exit();
 }
 
+if (isset($_POST['edit_user'])) {
+    $membership_id = $_POST['membership_id'];
+    $first_name = $_POST['first_name'];
+    $middle_name = $_POST['middle_name'] ?? null;
+    $last_name = $_POST['last_name'];
+    $suffix = $_POST['suffix'] ?? null;
+    $email = $_POST['email'];
+    $user_type = $_POST['user_type'];
+    $street = $_POST['street'] ?? null;
+    $purok = $_POST['purok'] ?? null;
+    $barangay = $_POST['barangay'] ?? null;
+    $city = $_POST['city'] ?? null;
+    $phone_number = $_POST['phone_number'] ?? null;
+    $date_of_birth = $_POST['date_of_birth'] ?? null;
+
+    try {
+        $sql = "UPDATE users 
+                SET first_name = ?, middle_name = ?, last_name = ?, suffix = ?, email = ?, 
+                    user_type = ?, street = ?, purok = ?, barangay = ?, city = ?, phone_number = ?, date_of_birth = ?
+                WHERE membership_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $first_name, $middle_name, $last_name, $suffix, $email, 
+            $user_type, $street, $purok, $barangay, $city, $phone_number, $date_of_birth, $membership_id
+        ]);
+
+        echo "User updated successfully!";
+    } catch (PDOException $e) {
+        echo "Database error: " . htmlspecialchars($e->getMessage());
+    }
+}
+
 // Function to delete a user
 if (isset($_GET['delete_user'])) {
     $user_id = $_GET['delete_user'];
@@ -246,11 +278,11 @@ $users = getUsers($searchTerm);
                                         <input type="text" name="phone_number" class="form-control mb-3" value="<?php echo $user['phone_number']; ?>" placeholder="Phone Number" required>
                                         <input type="text" name="barangay" class="form-control mb-3" value="<?php echo $user['barangay']; ?>" placeholder="Barangay" required>
                                         <input type="text" name="city" class="form-control mb-3" value="<?php echo $user['city']; ?>" placeholder="City" required>
-                                        <select name="user_type" class="form-select" required>
-                                            <option value="admin" <?php echo ($user['user_type'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
-                                            <option value="staff" <?php echo ($user['user_type'] == 'staff') ? 'selected' : ''; ?>>Staff</option>
-                                            <option value="faculty" <?php echo ($user['user_type'] == 'faculty') ? 'selected' : ''; ?>>Faculty</option>
-                                            <option value="student" <?php echo ($user['user_type'] == 'student') ? 'selected' : ''; ?>>Student</option>
+                                        <select name="user_type" class="form-select" <?php echo $user['user_type']; ?>required>
+                                            <option value="admin">Admin</option>
+                                            <option value="staff">Staff</option>
+                                            <option value="faculty">Faculty</option>
+                                            <option value="student">Student</option>
                                         </select>
                                     </div>
                                 </div>
@@ -289,7 +321,7 @@ $users = getUsers($searchTerm);
                                 <td><?php echo htmlspecialchars($user['email']); ?></td>
                                 <td><?php echo htmlspecialchars($user['phone_number']); ?></td>
                                 <td><?php echo htmlspecialchars($user['date_of_birth']); ?></td>
-                                <td><?php echo htmlspecialchars($user['street'] . ' ' . $user['barangay'] . ' ' . $user['city']); ?></td>
+                                <td><?php echo htmlspecialchars($user['street'] . ' ' . $user['purok'] . ' ' . $user['barangay'] . ' ' . $user['city']); ?></td>
 
                                 <td>
                                     <!-- Edit User Modal -->
