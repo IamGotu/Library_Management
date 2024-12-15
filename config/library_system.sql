@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 15, 2024 at 03:43 PM
+-- Generation Time: Dec 15, 2024 at 06:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,23 +35,19 @@ CREATE TABLE `books` (
   `Author` varchar(255) NOT NULL,
   `ISBN` varchar(20) NOT NULL,
   `Publisher` varchar(255) DEFAULT NULL,
-  `Edition` varchar(50) DEFAULT NULL,
   `PublicationDate` date DEFAULT NULL,
-  `Genre` varchar(100) DEFAULT NULL,
-  `Status` enum('available','unavailable','Available','Borrowed','Reserved') DEFAULT 'available'
+  `Genre` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`BookID`, `Title`, `Author`, `ISBN`, `Publisher`, `Edition`, `PublicationDate`, `Genre`, `Status`) VALUES
-(78, '', 'Harper Lee', '978-0061120084', 'J.B. Lippincott & Co.', NULL, '1960-07-11', NULL, 'available'),
-(79, '', 'Patrick M. Fitzpatrick', '978-0534376034', 'Brooks Cole', NULL, '2002-01-01', NULL, 'available'),
-(80, '', 'American Psychological Association', '978-1433832176', 'APA Publishing', NULL, '2020-12-15', NULL, 'available'),
-(81, '', 'Yuval Noah Harari', '978-0062316097', 'Harper', NULL, '2015-02-10', NULL, 'available'),
-(124, '', 'adsad', 'aada', 'asdad', NULL, '2024-12-10', NULL, 'available'),
-(158, '', '11', '11', '11', NULL, '2024-12-11', NULL, 'available');
+INSERT INTO `books` (`BookID`, `Title`, `Author`, `ISBN`, `Publisher`, `PublicationDate`, `Genre`) VALUES
+(78, 'To Kill a Mockingbird', 'Harper Lee', '978-0024568541', 'J.B. Lippincott & Co.', '1960-07-11', 'Fiction'),
+(79, 'Advanced Calculus', 'Patrick M. Fitzpatrick', '978-0534376034', 'Brooks Cole', '2002-01-01', 'Academic'),
+(80, 'APA Handbook of Psychology', 'American Psychological Association', '978-1433832176', 'APA Publishing', '2020-12-15', 'Reference'),
+(81, 'Sapiens: A Brief History of Humankind', 'Yuval Noah Harari', '978-0062316097', 'Harper', '2015-02-10', 'Non-Fiction');
 
 -- --------------------------------------------------------
 
@@ -126,8 +122,8 @@ CREATE TABLE `libraryresources` (
 --
 
 INSERT INTO `libraryresources` (`ResourceID`, `Title`, `AccessionNumber`, `Category`, `ResourceType`, `AvailabilityStatus`) VALUES
-(78, 'To Kill a Mockingbird', 'B-2024-001', 'Fiction', 'Book', 'Checked Out'),
-(79, 'Advanced Calculus', 'B-2024-002', 'Academic', 'Book', 'Available'),
+(78, 'To Kill a Mockingbird', 'B-2024-001', 'Fiction', 'Book', 'Available'),
+(79, 'Advanced Calculus', 'B-2024-002', 'Academic', 'Book', 'Checked Out'),
 (80, 'APA Handbook of Psychology', 'B-2024-003', 'Reference', 'Book', 'Available'),
 (81, 'Sapiens: A Brief History of Humankind', 'B-2024-004', 'Non-Fiction', 'Book', 'Available'),
 (102, 'Harry Potter and the Sorcerer\'s Stone', 'R-2024-001', 'AudioBook', 'MediaResource', 'Available'),
@@ -135,7 +131,7 @@ INSERT INTO `libraryresources` (`ResourceID`, `Title`, `AccessionNumber`, `Categ
 (108, 'Thriller by Michael Jackson', 'R-2024-003', 'Music', 'MediaResource', 'Available'),
 (109, 'The Godfather Trilogy', 'R-2024-004', 'Film', 'MediaResource', 'Available'),
 (118, 'The Global Times', 'P-2024-001', 'Newspaper', 'Periodical', 'Available'),
-(119, 'Tech Insider Weekly', 'P-2024-002', 'Newsletter', 'Periodical', 'Available'),
+(119, 'Tech Insider Weekly', 'P-2024-002', 'Newsletter', 'Periodical', 'Checked Out'),
 (120, 'Style & Design Magazine', 'P-2024-003', 'Magazine', 'Periodical', 'Available'),
 (122, 'Corporate Insights Bulletin', 'P-2024-005', 'Bulletin', 'Periodical', 'Available'),
 (123, 'Journal of Modern Economics', 'P-2024-004', 'Journal', 'Periodical', 'Available');
@@ -223,7 +219,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `suffix`, `email`, `user_type`, `borrow_limit`, `date_of_birth`, `street`, `purok`, `barangay`, `city`, `phone_number`, `status`, `membership_id`, `password`, `created_at`, `updated_at`) VALUES
-(17, 'admin', 'admin', 'admin', 'admin', 'admin@gmail.com', 'admin', NULL, '2001-06-14', 'Blck. 03', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '1009147', '$2y$10$uAhLQsZI5HZG8U96WkJ0R.NC301KyTw2xbUz6LBAV6EWiFP1zvXvm', '2024-12-15 14:38:31', '2024-12-15 14:41:15');
+(17, 'admin', 'admin', 'admin', 'admin', 'admin@gmail.com', 'admin', NULL, '2001-06-14', 'Blck. 03', 'Prk. Lansang Village', 'Brgy. Sinawal', 'General Santos City', '09514810354', 'active', '1009147', '$2y$10$uAhLQsZI5HZG8U96WkJ0R.NC301KyTw2xbUz6LBAV6EWiFP1zvXvm', '2024-12-15 14:38:31', '2024-12-15 14:41:15'),
+(18, 'student', 'student', 'student', 'student', 'student@gmail.com', 'student', NULL, '2001-06-14', '', 'Lansang Village', 'Sinawal', 'GSC', '09514810354', 'active', '4004363', '$2y$10$W/wbsOvPDiGzsxMbJxl7leb3AqzKJwNMp7ugllj6Kn/NpNWIO2sMu', '2024-12-15 14:44:15', '2024-12-15 14:45:13'),
+(19, 'staff', 'staff', 'staff', 'staff', 'staff@gmail.com', 'staff', NULL, '1997-06-14', '', '', 'Sinawal', 'General Santos City', '09514810354', 'active', '2002972', '$2y$10$zgUmMV9WHry4zmmWvxk1rO8jr9xGUNcYkFilBBQ7.8Y6ZTaF9VZgy', '2024-12-15 14:49:03', '2024-12-15 14:49:03'),
+(20, 'faculty', 'faculty', 'faculty', 'faculty', 'faculty@gmail.com', 'faculty', NULL, '1997-06-14', '', '', 'Sinawal', 'General Santos City', '09514810354', 'active', '3004711', '$2y$10$rKpOWeIfkDpgtP27A7PW2.weIjPX13sjYBGuiPiLOPGF9LZrz33wC', '2024-12-15 14:49:48', '2024-12-15 14:49:48');
 
 --
 -- Indexes for dumped tables
@@ -296,13 +295,13 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `borrow_transactions`
 --
 ALTER TABLE `borrow_transactions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `fines`
 --
 ALTER TABLE `fines`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `libraryresources`
@@ -326,7 +325,7 @@ ALTER TABLE `periodicals`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Constraints for dumped tables
