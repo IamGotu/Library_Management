@@ -26,6 +26,8 @@
             <ul class="dropdown-menu" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" href="/admin/profile/profile.php">Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/admin/reports/reports.php">Reports</a></li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="../../login/logout.php">Logout</a></li>
             </ul>
         </li>
