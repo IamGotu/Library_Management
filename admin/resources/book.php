@@ -154,9 +154,9 @@ if (isset($_POST['edit_book'])) {
         $stmtLibrary->execute([$title, $genre, $resourceID]);
 
         // Update Books
-        $sqlBook = "UPDATE Books SET Author = ?, ISBN = ?, Publisher = ?, PublicationDate = ? WHERE BookID = ?";
+        $sqlBook = "UPDATE Books SET Title = ?, Author = ?, ISBN = ?, Genre = ?, Publisher = ?, PublicationDate = ? WHERE BookID = ?";
         $stmtBook = $pdo->prepare($sqlBook);
-        $stmtBook->execute([$author, $isbn, $publisher, $publication_date, $resourceID]);
+        $stmtBook->execute([$title, $author, $isbn, $genre, $publisher, $publication_date, $resourceID]);
 
         $pdo->commit();
     } catch (Exception $e) {
@@ -175,92 +175,107 @@ $books = getBooks();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Management</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../components/css/resources.css"> <!-- Custom styles -->
+    <link rel="stylesheet" href="../../components/css/view.css">
     <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
+<!-- Navbar -->
+<?php include '../layout/navbar.php'; ?>
 
-<!-- Container -->
-<div class="container">
+<!-- Main Content -->
+<div class="content-wrapper">
+    <div class="container">
 
-    <!-- Add New Book Form -->
-    <h3 class="text-center">Add Book</h3>
-    <form method="POST" action="book.php" class="mb-5">
-        <input type="text" name="title" placeholder="Title" required>
-        <input type="text" name="author" placeholder="Author" required>
-        <input type="text" name="isbn" placeholder="ISBN" required>
-        <input type="text" name="publisher" placeholder="Publisher">
-        <input type="date" name="publication_date" placeholder="Publication Date">
-        <select name="genre" required>
-            <option value="Fiction">Fiction</option>
-            <option value="Non-Fiction">Non-Fiction</option>
-            <option value="Academic">Academic</option>
-            <option value="Reference">Reference</option>
-        </select>
-        <button type="submit" class="rounded mt-3 w-100" name="add_book">Add Book</button>
-    </form>
-
-    <!-- Edit Book Form -->
-    <?php if (isset($_GET['edit_book'])): 
-        $book = getBook($_GET['edit_book']);
-    ?>
-        <h3 class="text-center">Edit Book</h3>
-        <form method="POST" action="book.php">
-            <input type="hidden" name="resourceID" value="<?php echo $book['ResourceID']; ?>">
-            <input type="text" name="title" value="<?php echo htmlspecialchars($book['Title']); ?>" required>
-            <input type="text" name="author" value="<?php echo htmlspecialchars($book['Author']); ?>" required>
-            <input type="text" name="isbn" value="<?php echo htmlspecialchars($book['ISBN']); ?>" required>
-            <input type="text" name="publisher" value="<?php echo htmlspecialchars($book['Publisher']); ?>">
-            <input type="date" name="publication_date" value="<?php echo htmlspecialchars($book['PublicationDate']); ?>">
-            <select name="genre" required>
-                <option value="Fiction" <?php echo ($book['Genre'] == 'Fiction') ? 'selected' : ''; ?>>Fiction</option>
-                <option value="Non-Fiction" <?php echo ($book['Genre'] == 'Non-Fiction') ? 'selected' : ''; ?>>Non-Fiction</option>
-                <option value="Academic" <?php echo ($book['Genre'] == 'Academic') ? 'selected' : ''; ?>>Academic</option>
-                <option value="Reference" <?php echo ($book['Genre'] == 'Reference') ? 'selected' : ''; ?>>Reference</option>
-            </select>
-            <button type="submit" class="rounded mt-3 w-100" name="edit_book">Update Book</button>
+        <!-- Add New Book Form -->
+        <div class="centered-heading">
+            <h2 class="text-center">Add New Book</h2>
+        </div>
+        <form method="POST" action="book.php" class="form-label">
+            <div class="d-flex justify-content-center">
+                <input type="text" name="title" placeholder="Title" required>
+                <input type="text" name="author" placeholder="Author" required>
+                <input type="text" name="isbn" placeholder="ISBN" required>
+                <input type="text" name="publisher" placeholder="Publisher">
+                <input type="date" name="publication_date" placeholder="Publication Date">
+                <select name="genre" required>
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Academic">Academic</option>
+                    <option value="Reference">Reference</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary rounded mt-3 w-100" name="add_book">Add Book</button>
         </form>
-    <?php endif; ?>
 
-    <!-- Book List -->
-    <h3 class="text-center">Book List</h3>
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>ISBN</th>
-                <th>Publisher</th>
-                <th>Genre</th>
-                <th>Publication Date</th>
-                <th>Accession Number</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($books as $book): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($book['Title']); ?></td>
-                    <td><?php echo htmlspecialchars($book['Author']); ?></td>
-                    <td><?php echo htmlspecialchars($book['ISBN']); ?></td>
-                    <td><?php echo htmlspecialchars($book['Publisher']); ?></td>
-                    <td><?php echo htmlspecialchars($book['Genre']); ?></td>
-                    <td><?php echo htmlspecialchars($book['PublicationDate']); ?></td>
-                    <td><?php echo htmlspecialchars($book['AccessionNumber']); ?></td>
-                    <td>
-                        <a href="book.php?edit_book=<?php echo $book['ResourceID']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="book.php?delete_book=<?php echo $book['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+        <!-- Edit Book Form -->
+        <?php if (isset($_GET['edit_book'])): 
+            $book = getBook($_GET['edit_book']);
+        ?>  
+            <div class="centered-heading">
+                <h2 class="text-center">Edit Book</h2>
+            </div>
+            <form method="POST" action="book.php">
+                <div class="d-flex justify-content-center">
+                    <input type="hidden" name="resourceID" value="<?php echo $book['ResourceID']; ?>">
+                    <input type="text" name="title" value="<?php echo htmlspecialchars($book['Title']); ?>" required>
+                    <input type="text" name="author" value="<?php echo htmlspecialchars($book['Author']); ?>" required>
+                    <input type="text" name="isbn" value="<?php echo htmlspecialchars($book['ISBN']); ?>" required>
+                    <input type="text" name="publisher" value="<?php echo htmlspecialchars($book['Publisher']); ?>">
+                    <input type="date" name="publication_date" value="<?php echo htmlspecialchars($book['PublicationDate']); ?>">
+                    <select name="genre" required>
+                        <option value="Fiction" <?php echo ($book['Genre'] == 'Fiction') ? 'selected' : ''; ?>>Fiction</option>
+                        <option value="Non-Fiction" <?php echo ($book['Genre'] == 'Non-Fiction') ? 'selected' : ''; ?>>Non-Fiction</option>
+                        <option value="Academic" <?php echo ($book['Genre'] == 'Academic') ? 'selected' : ''; ?>>Academic</option>
+                        <option value="Reference" <?php echo ($book['Genre'] == 'Reference') ? 'selected' : ''; ?>>Reference</option>
+                    </select>
+                </div>
+                <button type="submit" class="bt btn-primary rounded mt-3 w-100" name="edit_book">Update Book</button>
+            </form>
+        <?php endif; ?>
 
-    <!-- Go Back Button -->
-    <a href="../view.php" class="text-center go-back-btn mt-3 w-100">Go Back to Dashboard</a>
+        <!-- Book List -->
+        <div class="centered-heading">
+            <h2 class="text-center">Book List</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Publisher</th>
+                        <th>Genre</th>
+                        <th>Publication Date</th>
+                        <th>Accession Number</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($books as $book): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($book['Title']); ?></td>
+                            <td><?php echo htmlspecialchars($book['Author']); ?></td>
+                            <td><?php echo htmlspecialchars($book['ISBN']); ?></td>
+                            <td><?php echo htmlspecialchars($book['Publisher']); ?></td>
+                            <td><?php echo htmlspecialchars($book['Genre']); ?></td>
+                            <td><?php echo htmlspecialchars($book['PublicationDate']); ?></td>
+                            <td><?php echo htmlspecialchars($book['AccessionNumber']); ?></td>
+                            <td>
+                                <a href="book.php?edit_book=<?php echo $book['ResourceID']; ?>" class="btn btn-secondary btn-sm">Edit</a>
+                                <br> <br>
+                                <a href="book.php?delete_book=<?php echo $book['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
+        
+    </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

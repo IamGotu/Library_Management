@@ -164,7 +164,7 @@ $mediaResources = getMediaResources();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Resource Management</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../components/css/resources.css"> <!-- Reference CSS -->
+    <link rel="stylesheet" href="../../components/css/view.css">
     <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
     <script>
         // JavaScript to show/hide the custom input field based on dropdown selection
@@ -182,113 +182,124 @@ $mediaResources = getMediaResources();
 </head>
 <body>
 
-    <!-- Container -->
+<!-- Navbar -->
+<?php include '../layout/navbar.php'; ?>
+
+<!-- Main Content -->
+<div class="content-wrapper">
     <div class="container">
 
         <!-- Add New Media Resource Form -->
-        <h3 class="text-center">Add Media Resource</h3>
+        <div class="centered-heading">
+            <h2 class="text-center">Add New Media Resource</h2>
+        </div>
         <form method="POST" action="media.php">
-            <input type="text" name="title" placeholder="Title" required>
-            
-            <!-- Format Dropdown -->
-            <select name="format" id="format" onchange="toggleCustomField('format')" required>
-                <option value="">Format</option>
-                <option value="DVD">DVD</option>
-                <option value="Blu-ray">Blu-ray</option>
-                <option value="VHS">VHS</option>
-                <option value="Digital">Digital</option>
-                <option value="Other">Other</option>
-            </select>
-            <input type="text" name="custom_format" id="custom_format" placeholder="Enter custom format" style="display:none;">
-            
-            <!-- Runtime -->
-            <input type="text" name="runtime" placeholder="Runtime">
-            
-            <!-- Media Type Dropdown -->
-            <select name="media_type" id="media_type" onchange="toggleCustomField('media_type')" required>
-                <option value="">Media Type</option>
-                <option value="Film">Film</option>
-                <option value="Music">Music</option>
-                <option value="AudioBook">Audio Book</option>
-                <option value="Other">Other</option>
-            </select>
-            <input type="text" name="custom_media_type" id="custom_media_type" placeholder="Enter custom media type" style="display:none;">
-
-            <button type="submit" name="add_media" class="rounded mt-3 w-100">Add Media Resource</button>
+            <div class="d-flex justify-content-center">
+                <input type="text" name="title" placeholder="Title" required>
+                
+                <!-- Format Dropdown -->
+                <select name="format" id="format" onchange="toggleCustomField('format')" required>
+                    <option value="">Format</option>
+                    <option value="DVD">DVD</option>
+                    <option value="Blu-ray">Blu-ray</option>
+                    <option value="VHS">VHS</option>
+                    <option value="Digital">Digital</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" name="custom_format" id="custom_format" placeholder="Enter custom format" style="display:none;">
+                
+                <!-- Runtime -->
+                <input type="text" name="runtime" placeholder="Runtime">
+                
+                <!-- Media Type Dropdown -->
+                <select name="media_type" id="media_type" onchange="toggleCustomField('media_type')" required>
+                    <option value="">Media Type</option>
+                    <option value="Film">Film</option>
+                    <option value="Music">Music</option>
+                    <option value="AudioBook">Audio Book</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" name="custom_media_type" id="custom_media_type" placeholder="Enter custom media type" style="display:none;">
+            </div>
+            <button type="submit" name="add_media" class="bt btn-primary rounded mt-3 w-100">Add Media Resource</button>
         </form>
 
-    <?php if (isset($_GET['edit_media'])): 
-        $mediaResources = getMediaResources();  // Use the correct function here
-        $media = array_filter($mediaResources, function($media) {
-            return $media['ResourceID'] == $_GET['edit_media'];
-        });
-        $media = array_shift($media);  // Get the media resource with the specified ID
-    ?>
+        <?php if (isset($_GET['edit_media'])): 
+            $mediaResources = getMediaResources();  // Use the correct function here
+            $media = array_filter($mediaResources, function($media) {
+                return $media['ResourceID'] == $_GET['edit_media'];
+            });
+            $media = array_shift($media);  // Get the media resource with the specified ID
+        ?>
 
-    <h3 class="text-center">Edit Media Resource</h3>
-    <form method="POST" action="media.php">
-        <input type="hidden" name="resourceID" value="<?php echo $media['ResourceID']; ?>">
-        <input type="text" name="title" value="<?php echo htmlspecialchars($media['Title']); ?>" required>
-        
-        <!-- Format Dropdown -->
-        <select name="format" id="format" onchange="toggleCustomField('format')" required>
-            <option value="DVD" <?php echo ($media['Format'] == 'DVD') ? 'selected' : ''; ?>>DVD</option>
-            <option value="Blu-ray" <?php echo ($media['Format'] == 'Blu-ray') ? 'selected' : ''; ?>>Blu-ray</option>
-            <option value="VHS" <?php echo ($media['Format'] == 'VHS') ? 'selected' : ''; ?>>VHS</option>
-            <option value="Digital" <?php echo ($media['Format'] == 'Digital') ? 'selected' : ''; ?>>Digital</option>
-            <option value="Other">Other</option>
-        </select>
-        <input type="text" name="custom_format" id="custom_format" placeholder="Enter custom format" style="display:none;">
+        <div class="centered-heading">
+            <h2 class="text-center">Edit Media Resource Management</h2>
+        </div>
+        <form method="POST" action="media.php">
+            <div class="d-flex justify-content-center">
+                <input type="hidden" name="resourceID" value="<?php echo $media['ResourceID']; ?>">
+                <input type="text" name="title" value="<?php echo htmlspecialchars($media['Title']); ?>" required>
+                
+                <!-- Format Dropdown -->
+                <select name="format" id="format" onchange="toggleCustomField('format')" required>
+                    <option value="DVD" <?php echo ($media['Format'] == 'DVD') ? 'selected' : ''; ?>>DVD</option>
+                    <option value="Blu-ray" <?php echo ($media['Format'] == 'Blu-ray') ? 'selected' : ''; ?>>Blu-ray</option>
+                    <option value="VHS" <?php echo ($media['Format'] == 'VHS') ? 'selected' : ''; ?>>VHS</option>
+                    <option value="Digital" <?php echo ($media['Format'] == 'Digital') ? 'selected' : ''; ?>>Digital</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" name="custom_format" id="custom_format" placeholder="Enter custom format" style="display:none;">
 
-        <!-- Runtime -->
-        <input type="text" name="runtime" value="<?php echo htmlspecialchars($media['Runtime']); ?>" placeholder="Runtime">
+                <!-- Runtime -->
+                <input type="text" name="runtime" value="<?php echo htmlspecialchars($media['Runtime']); ?>" placeholder="Runtime">
 
-        <!-- Media Type Dropdown -->
-        <select name="media_type" id="media_type" onchange="toggleCustomField('media_type')" required>
-            <option value="Film" <?php echo ($media['MediaType'] == 'Film') ? 'selected' : ''; ?>>Film</option>
-            <option value="Music" <?php echo ($media['MediaType'] == 'Music') ? 'selected' : ''; ?>>Music</option>
-            <option value="AudioBook" <?php echo ($media['MediaType'] == 'AudioBook') ? 'selected' : ''; ?>>Audio Book</option>
-            <option value="Other">Other</option>
-        </select>
-        <input type="text" name="custom_media_type" id="custom_media_type" placeholder="Enter custom media type" style="display:none;">
+                <!-- Media Type Dropdown -->
+                <select name="media_type" id="media_type" onchange="toggleCustomField('media_type')" required>
+                    <option value="Film" <?php echo ($media['MediaType'] == 'Film') ? 'selected' : ''; ?>>Film</option>
+                    <option value="Music" <?php echo ($media['MediaType'] == 'Music') ? 'selected' : ''; ?>>Music</option>
+                    <option value="AudioBook" <?php echo ($media['MediaType'] == 'AudioBook') ? 'selected' : ''; ?>>Audio Book</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" name="custom_media_type" id="custom_media_type" placeholder="Enter custom media type" style="display:none;">
+            </div>
+            <button type="submit" class="bt btn-primary rounded mt-3 w-100" name="edit_media">Update Media Resource</button>
+        </form>
+        <?php endif; ?>
 
-        <button type="submit" class="rounded mt-3 w-100" name="edit_media">Update Media Resource</button>
-    </form>
-<?php endif; ?>
-
-
-    <!-- Media Resource List -->
-    <h3 class="text-center">Media Resource List</h3>
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Format</th>
-                <th>Runtime</th>
-                <th>Media Type</th>
-                <th>Accession Number</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($mediaResources as $media): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($media['Title']); ?></td>
-                    <td><?php echo htmlspecialchars($media['Format']); ?></td>
-                    <td><?php echo htmlspecialchars($media['Runtime']); ?></td>
-                    <td><?php echo htmlspecialchars($media['MediaType']); ?></td>
-                    <td><?php echo htmlspecialchars($media['AccessionNumber']); ?></td>
-                    <td>
-                        <a href="media.php?edit_media=<?php echo $media['ResourceID']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="media.php?delete_media=<?php echo $media['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
-    <!-- Go Back Button -->
-    <a href="../view.php" class="text-center go-back-btn mt-3 w-100">Go Back to Dashboard</a>
+        <!-- Media Resource List -->
+        <div class="centered-heading">
+            <h2 class="text-center">Media Resource List</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Format</th>
+                        <th>Runtime</th>
+                        <th>Media Type</th>
+                        <th>Accession Number</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($mediaResources as $media): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($media['Title']); ?></td>
+                            <td><?php echo htmlspecialchars($media['Format']); ?></td>
+                            <td><?php echo htmlspecialchars($media['Runtime']); ?></td>
+                            <td><?php echo htmlspecialchars($media['MediaType']); ?></td>
+                            <td><?php echo htmlspecialchars($media['AccessionNumber']); ?></td>
+                            <td>
+                                <a href="media.php?edit_media=<?php echo $media['ResourceID']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="media.php?delete_media=<?php echo $media['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -150,94 +150,107 @@ $periodicals = getPeriodicals();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Periodical Management</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../components/css/resources.css">
+    <link rel="stylesheet" href="../../components/css/view.css">
     <link rel="icon" href="../../components/image/book.png" type="image/x-icon">
 </head>
 <body>
+<!-- Navbar -->
+<?php include '../layout/navbar.php'; ?>
 
-<div class="container">
-    <!-- Add Periodical Form -->
-    <h3 class="text-center">Add Periodical</h3>
-    <form method="POST" action="periodic.php" class="mb-5">
-        <input type="text" name="title" placeholder="Title" required>
-        <input type="text" name="issn" placeholder="ISSN" required>
-        <input type="text" name="volume" placeholder="Volume" required>
-        <input type="text" name="issue" placeholder="Issue">
-        <input type="date" name="publicationDate" placeholder="Publication Date">
-        <select name="type" required>
-            <option value="Newspaper">Newspaper</option>
-            <option value="Newsletter">Newsletter</option>
-            <option value="Magazine">Magazine</option>
-            <option value="Journal">Journal</option>
-            <option value="Bulletin">Bulletin</option>
-            <option value="Annual">Annual</option>
-        </select>
-        <button type="submit" class="rounded mt-3 w-100" name="add_periodical">Add Periodical</button>
-    </form>
-
-    <!-- Edit Periodical Form -->
-    <?php if (isset($_GET['edit_periodical'])): 
-        $periodical = getPeriodicals($_GET['edit_periodical']);
-    ?>
-        <h3 class="text-center">Edit Periodical</h3>
-        <form method="POST" action="periodic.php">
-            <input type="hidden" name="resourceID" value="<?php echo $periodical['ResourceID']; ?>">
-            <input type="text" name="title" value="<?php echo htmlspecialchars($periodical['Title']); ?>" required>
-            <input type="text" name="issn" value="<?php echo htmlspecialchars($periodical['ISSN']); ?>" required>
-            <input type="text" name="volume" value="<?php echo htmlspecialchars($periodical['Volume']); ?>" required>
-            <input type="text" name="issue" value="<?php echo htmlspecialchars($periodical['Issue']); ?>">
-            <input type="date" name="publicationDate" value="<?php echo htmlspecialchars($periodical['PublicationDate']); ?>">
-            <select name="type" required>
-                <option value="Newspaper" <?php echo ($periodical['Type'] == 'Newspaper') ? 'selected' : ''; ?>>Newspaper</option>
-                <option value="Newsletter" <?php echo ($periodical['Type'] == 'Newsletter') ? 'selected' : ''; ?>>Newsletter</option>
-                <option value="Magazine" <?php echo ($periodical['Type'] == 'Magazine') ? 'selected' : ''; ?>>Magazine</option>
-                <option value="Journal" <?php echo ($periodical['Type'] == 'Journal') ? 'selected' : ''; ?>>Journal</option>
-                <option value="Bulletin" <?php echo ($periodical['Type'] == 'Bulletin') ? 'selected' : ''; ?>>Bulletin</option>
-                <option value="Annual" <?php echo ($periodical['Type'] == 'Annual') ? 'selected' : ''; ?>>Annual</option>
-            </select>
-            <button type="submit" class="rounded mt-3 w-100" name="edit_periodical">Update Periodical</button>
+<!-- Main Content -->
+<div class="content-wrapper">
+    <div class="container">
+        <!-- Add Periodical Form -->
+        <div class="centered-heading">
+            <h2 class="text-center">Add New Periodical</h2>
+        </div>
+        <form method="POST" action="periodic.php" class="mb-5">
+            <div class="d-flex justify-content-center">
+                <input type="text" name="title" placeholder="Title" required>
+                <input type="text" name="issn" placeholder="ISSN" required>
+                <input type="text" name="volume" placeholder="Volume" required>
+                <input type="text" name="issue" placeholder="Issue">
+                <input type="date" name="publicationDate" placeholder="Publication Date">
+                <select name="type" required>
+                    <option value="Newspaper">Newspaper</option>
+                    <option value="Newsletter">Newsletter</option>
+                    <option value="Magazine">Magazine</option>
+                    <option value="Journal">Journal</option>
+                    <option value="Bulletin">Bulletin</option>
+                    <option value="Annual">Annual</option>
+                </select>
+            </div>
+            <button type="submit" class="bt btn-secondary rounded mt-3 w-100" name="add_periodical">Add Periodical</button>
         </form>
-    <?php endif; ?>
 
-    <!-- Periodical List -->
-    <h3 class="text-center">Periodical List</h3>
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>ISSN</th>
-                <th>Volume</th>
-                <th>Issue</th>
-                <th>Publication Date</th>
-                <th>Type</th>
-                <th>Accession Number</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($periodicals as $periodical): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($periodical['Title']); ?></td>
-                    <td><?php echo htmlspecialchars($periodical['ISSN']); ?></td>
-                    <td><?php echo htmlspecialchars($periodical['Volume']); ?></td>
-                    <td><?php echo htmlspecialchars($periodical['Issue']); ?></td>
-                    <td><?php echo htmlspecialchars($periodical['PublicationDate']); ?></td>
-                    <td><?php echo htmlspecialchars($periodical['Type']); ?></td>
-                    <td><?php echo htmlspecialchars($periodical['AccessionNumber']); ?></td>
-                    <td>
-                        <a href="periodic.php?edit_periodical=<?php echo $periodical['ResourceID']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="periodic.php?delete_periodical=<?php echo $periodical['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+        <!-- Edit Periodical Form -->
+        <?php if (isset($_GET['edit_periodical'])): 
+            $periodical = getPeriodicals($_GET['edit_periodical']);
+        ?>
 
-    <!-- Go Back Button -->
-    <a href="../view.php" class="text-center go-back-btn mt-3 w-100">Go Back to Dashboard</a>
+        <div class="centered-heading">
+            <h2 class="text-center">Edit Periodical</h2>
+        </div>
+        <form method="POST" action="periodic.php">
+            <div class="d-flex justify-content-center">
+                <input type="hidden" name="resourceID" value="<?php echo $periodical['ResourceID']; ?>">
+                <input type="text" name="title" value="<?php echo htmlspecialchars($periodical['Title']); ?>" required>
+                <input type="text" name="issn" value="<?php echo htmlspecialchars($periodical['ISSN']); ?>" required>
+                <input type="text" name="volume" value="<?php echo htmlspecialchars($periodical['Volume']); ?>" required>
+                <input type="text" name="issue" value="<?php echo htmlspecialchars($periodical['Issue']); ?>">
+                <input type="date" name="publicationDate" value="<?php echo htmlspecialchars($periodical['PublicationDate']); ?>">
+                <select name="type" required>
+                    <option value="Newspaper" <?php echo ($periodical['Type'] == 'Newspaper') ? 'selected' : ''; ?>>Newspaper</option>
+                    <option value="Newsletter" <?php echo ($periodical['Type'] == 'Newsletter') ? 'selected' : ''; ?>>Newsletter</option>
+                    <option value="Magazine" <?php echo ($periodical['Type'] == 'Magazine') ? 'selected' : ''; ?>>Magazine</option>
+                    <option value="Journal" <?php echo ($periodical['Type'] == 'Journal') ? 'selected' : ''; ?>>Journal</option>
+                    <option value="Bulletin" <?php echo ($periodical['Type'] == 'Bulletin') ? 'selected' : ''; ?>>Bulletin</option>
+                    <option value="Annual" <?php echo ($periodical['Type'] == 'Annual') ? 'selected' : ''; ?>>Annual</option>
+                </select>
+            </div>
+            <button type="submit" class="bt btn-secondary rounded mt-3 w-100" name="edit_periodical">Update Periodical</button>
+        </form>
+        <?php endif; ?>
 
+        <!-- Periodical List -->
+        <div class="centered-heading">
+            <h2 class="text-center">Periodical List</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>ISSN</th>
+                        <th>Volume</th>
+                        <th>Issue</th>
+                        <th>Publication Date</th>
+                        <th>Type</th>
+                        <th>Accession Number</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($periodicals as $periodical): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($periodical['Title']); ?></td>
+                            <td><?php echo htmlspecialchars($periodical['ISSN']); ?></td>
+                            <td><?php echo htmlspecialchars($periodical['Volume']); ?></td>
+                            <td><?php echo htmlspecialchars($periodical['Issue']); ?></td>
+                            <td><?php echo htmlspecialchars($periodical['PublicationDate']); ?></td>
+                            <td><?php echo htmlspecialchars($periodical['Type']); ?></td>
+                            <td><?php echo htmlspecialchars($periodical['AccessionNumber']); ?></td>
+                            <td>
+                                <a href="periodic.php?edit_periodical=<?php echo $periodical['ResourceID']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="periodic.php?delete_periodical=<?php echo $periodical['ResourceID']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
