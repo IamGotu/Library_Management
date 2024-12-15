@@ -138,6 +138,7 @@ $transactions = getActiveBorrowTransactions($resourceType, $searchTerm);
                                     <td><?php echo htmlspecialchars($transaction['status']); ?></td>
                                     <td>
                                         <a href="return.php?transactionID=<?php echo $transaction['ID']; ?>" class="btn btn-primary">Return</a>
+                                        <br> <br>
                                         <a href="overdue.php?transactionID=<?php echo $transaction['ID']; ?>" class="btn btn-danger">Overdue</a>
                                     </td>
                                 </tr>
