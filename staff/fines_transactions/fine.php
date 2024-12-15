@@ -14,6 +14,40 @@ include '../../config/db.php';
 $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_name, Borrower_middle_name, Borrower_last_name, Borrower_suffix, Amount, DateGenerated, PaidStatus, ID
                        FROM fines
                        WHERE PaidStatus = 'unpaid' OR ReceiptPrinted = 'no'")->fetchAll(PDO::FETCH_ASSOC);
+
+// Search and filter functionality
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+$paidStatus = isset($_GET['paid_status']) ? $_GET['paid_status'] : '';
+
+// Query to fetch fines with optional search and filter
+function getFilteredFines($searchTerm, $paidStatus) {
+    global $pdo;
+
+    $sql = "SELECT * FROM fines WHERE 1=1";
+    $params = [];
+
+    // Add search condition for BorrowerID or borrower names
+    if ($searchTerm) {
+        $sql .= " AND (BorrowerID LIKE :search OR 
+                       Borrower_first_name LIKE :search OR 
+                       Borrower_middle_name LIKE :search OR 
+                       Borrower_last_name LIKE :search)";
+        $params[':search'] = "%$searchTerm%";
+    }
+
+    // Add filter condition for PaidStatus
+    if ($paidStatus) {
+        $sql .= " AND PaidStatus = :paidStatus";
+        $params[':paidStatus'] = $paidStatus;
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch filtered fines
+$fines = getFilteredFines($searchTerm, $paidStatus);
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +70,34 @@ $fines = $pdo->query("SELECT BorrowTransactionID, BorrowerID, Borrower_first_nam
             <div class="centered-heading">
                 <h2>Overdue Fines</h2>
             </div>
+
+            <!-- Search and Filter Form -->
+            <form method="GET" action="fine.php">
+                <div class="row g-3">
+                    <!-- Search Bar -->
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search Borrower:</label>
+                        <input type="text" name="search" id="search" class="form-control" 
+                            placeholder="Borrower ID or Name" 
+                            value="<?php echo htmlspecialchars($searchTerm); ?>">
+                    </div>
+
+                    <!-- Paid Status Filter -->
+                    <div class="col-md-4">
+                        <label for="paid_status" class="form-label">Filter by Status:</label>
+                        <select name="paid_status" id="paid_status" class="form-select">
+                            <option value="">All</option>
+                            <option value="paid" <?php echo ($paidStatus == 'paid') ? 'selected' : ''; ?>>Paid</option>
+                            <option value="unpaid" <?php echo ($paidStatus == 'unpaid') ? 'selected' : ''; ?>>Unpaid</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
             
             <!-- Table Section -->
             <div class="table-container">
