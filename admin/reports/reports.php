@@ -51,71 +51,85 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Reports</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your external stylesheet -->
+    <title>Reports</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../components/css/view.css">
+    <link rel="icon" href="../../components/Image/book.png" type="image/x-icon">
 </head>
 <body>
-    <header>
-        <h1>Library System Reports</h1>
-    </header>
+    <!-- Navbar -->
+    <?php include '../layout/navbar.php'; ?>
 
-    <!-- Popular Books Report -->
-    <section id="popular-books">
-        <h2>Popular Books Based on Borrowing Frequency</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Author</th>
-                    <th>Number of Borrowings</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (!empty($popular_books_result)) {
-                    foreach ($popular_books_result as $row) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['book_title']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['Author']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['borrow_count']) . "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='3'>No popular books found.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </section>
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
+        <div class="container">
 
-    <!-- Inventory Summary -->
-    <section id="inventory-summary">
-        <h2>Inventory Summary</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Available Books</th>
-                    <th>Checked Out Books</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (!empty($inventory_summary_result)) {
-                    foreach ($inventory_summary_result as $row) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['Category']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['available_books']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['checked_out_books']) . "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='3'>No inventory data available.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </section>
+            <!-- Popular Books Report -->
+            <section id="popular-books" class="mt-4">
+            <div class="centered-heading">
+                <h2>Popular Books Report</h2>
+            </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Author</th>
+                                <th>Number of Borrowings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($popular_books_result)): ?>
+                                <?php foreach ($popular_books_result as $row): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['book_title']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['Author']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['borrow_count']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="3">No popular books found.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Inventory Summary -->
+            <section id="inventory-summary" class="mt-5">
+                <div class="centered-heading">
+                    <h2>Inventory Summary</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Available Books</th>
+                                <th>Checked Out Books</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($inventory_summary_result)): ?>
+                                <?php foreach ($inventory_summary_result as $row): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['Category']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['available_books']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['checked_out_books']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="3">No inventory data available.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Bootstrap Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
