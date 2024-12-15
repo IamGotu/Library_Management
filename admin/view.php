@@ -151,7 +151,37 @@ $categories = getCategoriesByResourceType($resourceType);
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>
+                <!-- Add Button -->
+                <button type="button" class="btn btn-primary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#addModal">
+                    Add Resources
+                </button>
             </form>
+
+            <!-- Add Resources Modal -->
+            <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addModalLabel" style="color: black;">Add New Resource</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color: black;">What would you like to add?</p>
+                            <div class="d-flex justify-content-around">
+                                <!-- Add Book Button -->
+                                <a href="/admin/resources/book.php" class="btn btn-success mt-3 w-100">Book</a>
+                                <!-- Add Media Button -->
+                                <a href="/admin/resources/media.php" class="btn btn-info mt-3 w-100 ">Media</a>
+                                <!-- Add Periodical Button -->
+                                <a href="/admin/resources/periodic.php" class="btn btn-warning mt-3 w-100">Periodical</a>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Search Results Table -->
             <div class="table-container">
