@@ -2,16 +2,16 @@ Users Email and Password:
 
 admin
 email: admin@gmail.com
-pass: admin
+default pass (last_name+membership_id): admin1009147
 
 staff
 email: staff@gmail.com
-pass: staff
+default pass (last_name+membership_id): staff2002972
 
 faculty
 email: faculty@gmail.com
-pass: faculty
+default pass (last_name+membership_id): faculty3004711
 
 student
 email: student@gmail.com
-pass: student
+default pass (last_name+membership_id): student4004363
