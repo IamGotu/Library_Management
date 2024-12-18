@@ -1,25 +1,37 @@
 <?php
-// Start the session to store error messages
 session_start();
-
-// Include database connection
 include '../config/db.php';
 
-// Handle form submission
 if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Prepare SQL query to check if the user exists
+    // Query to fetch user details
     $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch();
 
-    // Check if the user exists
+    // Check if user exists
     if ($user) {
-        if (password_verify($password, $user['password'])) {
-            // User is authenticated, store user details in session
+        $isPasswordValid = password_verify($password, $user['password']);
+        $user_type = $user['user_type'];
+
+        // Log the attempt for admin and staff
+        if ($user_type === 'admin' || $user_type === 'staff') {
+            $status = $isPasswordValid ? 'success' : 'failed';
+            $log_sql = "INSERT INTO user_login_history (user_id, email, user_type, status) VALUES (:user_id, :email, :user_type, :status)";
+            $log_stmt = $pdo->prepare($log_sql);
+            $log_stmt->execute([
+                'user_id'   => $user['id'],
+                'email'     => $email,
+                'user_type' => $user_type,
+                'status'    => $status
+            ]);
+        }
+
+        // Handle successful login
+        if ($isPasswordValid) {
             $_SESSION['user_id'] = $user['membership_id'];
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'] . ' ' . $user['suffix'];
             $_SESSION['user_type'] = $user['user_type'];
@@ -42,15 +54,14 @@ if (isset($_POST['login'])) {
                     header("Location: default_dashboard.php");
                     break;
             }
-            exit(); // Prevent further code execution after redirect
+            exit();
         } else {
-            // Incorrect password
             $_SESSION['password_error'] = "Invalid password.";
             header("Location: login.php");
             exit();
         }
     } else {
-        // Incorrect email
+        // If user doesn't exist
         $_SESSION['email_error'] = "Invalid email address.";
         header("Location: login.php");
         exit();
